@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body id="svgShowcase">
+    <!--BODY_CHECKPOINT-->
+    <script>
+      let data_points_loc = "./utils/exercise_28_data.csv";
+
+      d3.csv(data_points_loc).then(function (data) {
+        var data_p = data.map(function (d) {
+          return +d.data_points;
+        });
+
+        //const data = [50, 400, 300, 900, 250, 1000];
+        const width = 500;
+        const barHeight = 20;
+        const margin = 1;
+        var scale = d3
+          .scaleLinear()
+          .domain([d3.min(data_p), d3.max(data_p)])
+          .range([50, 500]);
+        var svg = d3
+          .select("body")
+          .append("svg")
+          .attr("width", width)
+          .attr("height", barHeight * data_p.length);
+        var g = svg
+          .selectAll("g")
+          .data(data_p)
+          .enter()
+          .append("g")
+          .attr("transform", function (d, i) {
+            return "translate(0," + i * barHeight + ")";
+          });
+
+        var myColor4 = d3.scaleOrdinal().domain(data_p).range(d3.schemeSet3);
+
+        g.append("rect")
+          .attr("width", function (d) {
+            return scale(d);
+          })
+          .style("fill", function (d) {
+            return myColor4(+d);
+          })
+          .attr("height", barHeight - margin);
+        g.append("text")
+          .attr("x", function (d) {
+            return scale(d);
+          })
+          .attr("y", barHeight / 2)
+          .attr("dy", ".35em")
+          .style("text-anchor", "end")
+          .text(function (d) {
+            return d;
+          });
+      });
+    </script>
+    <!--BODY_CHECKPOINT-->
+  </body>
+</html>

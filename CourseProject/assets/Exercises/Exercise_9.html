@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!--BODY_CHECKPOINT-->
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <script>
+      let titaniccsv =
+        "https://raw.githubusercontent.com/dsindy/kaggle-titanic/master/data/test.csv";
+
+      let mr_counter = 0;
+      let mrs_counter = 0;
+      let male_counter = 0;
+      let female_counter = 0;
+
+      d3.csv(titaniccsv).then(function (data) {
+        data.forEach((element) => {
+          if (element.Name.indexOf("Mr") >= 0) {
+            mr_counter += 1;
+          }
+          if (element.Name.indexOf("Mrs") >= 0) {
+            mrs_counter += 1;
+          }
+          if (element.Sex === "male") {
+            male_counter += 1;
+          }
+          if (element.Sex === "female") {
+            female_counter += 1;
+          }
+        });
+        var myData = [
+          "mr_counter: " + mr_counter,
+          "mrs_counter: " + mrs_counter,
+          "male_counter: " + male_counter,
+          "female_counter: " + female_counter,
+        ];
+        var p = d3
+          .select("body")
+          .selectAll("p")
+          .data(myData)
+          .text(function (d, i) {
+            return d;
+          });
+      });
+    </script>
+    <!--BODY_CHECKPOINT-->
+  </body>
+</html>

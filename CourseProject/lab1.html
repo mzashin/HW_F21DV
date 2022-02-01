@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700"
+    />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="./assets/docs/dashboardIconV3.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="./assets/css/css_main.css" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="./assets/js/script_src.js"></script>
+  </head>
+
+  <body class="body_main">
+    <a name="top"></a>
+    <a href="#top" class="BackToTopButtons"
+      >Return to <br />
+      top of <br />
+      Page</a
+    >
+    <nav class="nav">
+      <ul class="nav__list">
+        <li class="nav__listlogo">
+          <a href="https://www.hw.ac.uk/dubai/" target="_blank"
+            ><img src="././assets/docs/download.png" alt="heriottwatt_logo"
+          /></a>
+        </li>
+        <a href="./index_home.html"><li class="nav__listitem">Home</li></a>
+        <li class="nav__listitem">
+          CourseWork
+          <ul class="nav__listitemdrop">
+            <a href="./lab1.html"><li>Lab 1</li></a>
+          </ul>
+        </li>
+        <li class="nav__listitem">
+          Links
+          <ul class="nav__listitemdrop">
+            <a href="https://github.com/mzashin/HW" target="_blank"
+              ><li>
+                <i style="font-size: 18px" class="fa">&#xf09b;</i> GitHub
+              </li></a
+            >
+          </ul>
+        </li>
+        <a href="./student_info.html"
+          ><li class="nav__listitem">Student Info</li></a
+        >
+      </ul>
+    </nav>
+
+    <div class="exercise_parent_container">
+      <div class="exercise_card_container" id="lab1_header">
+        <div class="exercise_title_container">
+          <div class="lab_title">Lab 1 - Basics</div>
+          <a
+            href="./assets/docs/Lab1 - Basics-5.pdf"
+            class="loadButtons"
+            target="_blank"
+          >
+            Lab Pdf
+          </a>
+          <a
+            href="https://canvas.hw.ac.uk/courses/5296/assignments/67273"
+            class="loadButtons"
+            target="_blank"
+            >Canvas Link</a
+          >
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableAllOutput('code_output')"
+          >
+            Load All Output
+          </button>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="resetAllOutput('code_output')"
+          >
+            Reset All Output
+          </button>
+        </div>
+      </div>
+
+      <div class="exercise_card_container" id="lab1_header">
+        <div class="exercise_navigator_title_container">
+          <div class="nav_title">Navigate to Exercise</div>
+        </div>
+        <div class="exercise_navigator_container">
+          <a href="#e1" class="loadButtonsNavigator">1</a>
+          <a href="#e2" class="loadButtonsNavigator">2</a>
+          <a href="#e3" class="loadButtonsNavigator">3</a>
+          <a href="#e4" class="loadButtonsNavigator">4</a>
+          <a href="#e5" class="loadButtonsNavigator">5</a>
+          <a href="#e6" class="loadButtonsNavigator">6</a>
+          <a href="#e7" class="loadButtonsNavigator">7</a>
+          <a href="#e8" class="loadButtonsNavigator">8</a>
+          <a href="#e9" class="loadButtonsNavigator">9</a>
+          <a href="#e10" class="loadButtonsNavigator">10</a>
+          <a href="#e11" class="loadButtonsNavigator">11</a>
+          <a href="#e12" class="loadButtonsNavigator">12</a>
+          <a href="#e13" class="loadButtonsNavigator">13</a>
+          <a href="#e14" class="loadButtonsNavigator">14</a>
+          <a href="#e15" class="loadButtonsNavigator">15</a>
+          <a href="#e16" class="loadButtonsNavigator">16</a>
+          <a href="#e17" class="loadButtonsNavigator">17</a>
+          <a href="#e18" class="loadButtonsNavigator">18</a>
+          <a href="#e19" class="loadButtonsNavigator">19</a>
+          <a href="#e20" class="loadButtonsNavigator">20</a>
+          <a href="#e21" class="loadButtonsNavigator">21</a>
+          <a href="#e22" class="loadButtonsNavigator">22</a>
+          <a href="#e23" class="loadButtonsNavigator">23</a>
+          <a href="#e24" class="loadButtonsNavigator">24</a>
+          <a href="#e25" class="loadButtonsNavigator">25</a>
+          <a href="#e26" class="loadButtonsNavigator">26</a>
+          <a href="#e27" class="loadButtonsNavigator">27</a>
+          <a href="#e28" class="loadButtonsNavigator">28</a>
+          <a href="#e29" class="loadButtonsNavigator">29</a>
+          <a href="#e30" class="loadButtonsNavigator">30</a>
+          <a href="#e31" class="loadButtonsNavigator">31</a>
+          <a href="#e32" class="loadButtonsNavigator">32</a>
+        </div>
+      </div>
+
+      <!-- Exercise 1 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e1">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 1</div>
+          <button type="button" class="loadButtons" onclick="enableOutput('1')">
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e1_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e1_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("1");
+          window.onload = loadOutput("1");
+        </script>
+      </div>
+
+      <!-- Exercise 2 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e2">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 2</div>
+          <button type="button" class="loadButtons" onclick="enableOutput('2')">
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e2_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e2_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("2");
+          window.onload = loadOutput("2");
+        </script>
+      </div>
+
+      <!-- Exercise 3 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e3">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 3</div>
+          <button type="button" class="loadButtons" onclick="enableOutput('3')">
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e3_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e3_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("3");
+          window.onload = loadOutput("3");
+        </script>
+      </div>
+
+      <!-- Exercise 4 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e4">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 4</div>
+          <button type="button" class="loadButtons" onclick="enableOutput('4')">
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e4_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e4_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("4");
+          window.onload = loadOutput("4");
+        </script>
+      </div>
+
+      <!-- Exercise 5 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e5">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 5</div>
+          <button type="button" class="loadButtons" onclick="enableOutput('5')">
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e5_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e5_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("5");
+          window.onload = loadOutput("5");
+        </script>
+      </div>
+
+      <!-- Exercise 6 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e6">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 6</div>
+          <button type="button" class="loadButtons" onclick="enableOutput('6')">
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e6_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e6_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("6");
+          window.onload = loadOutput("6");
+        </script>
+      </div>
+
+      <!-- Exercise 7 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e7">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 7</div>
+          <button type="button" class="loadButtons" onclick="enableOutput('7')">
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e7_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e7_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("7");
+          window.onload = loadOutput("7");
+        </script>
+      </div>
+
+      <!-- Exercise 8 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e8">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 8</div>
+          <button type="button" class="loadButtons" onclick="enableOutput('8')">
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e8_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e8_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("8");
+          window.onload = loadOutput("8");
+        </script>
+      </div>
+
+      <!-- Exercise 9 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e9">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 9</div>
+          <button type="button" class="loadButtons" onclick="enableOutput('9')">
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e9_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e9_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("9");
+          window.onload = loadOutput("9");
+        </script>
+      </div>
+
+      <!-- Exercise 10 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e10">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 10</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('10')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e10_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e10_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("10");
+          window.onload = loadOutput("10");
+        </script>
+      </div>
+
+      <!-- Exercise 11 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e11">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 11</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('11')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e11_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e11_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("11");
+          window.onload = loadOutput("11");
+        </script>
+      </div>
+
+      <!-- Exercise 12 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e12">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 12</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('12')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e12_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e12_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("12");
+          window.onload = loadOutput("12");
+        </script>
+      </div>
+
+      <!-- Exercise 13 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e13">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 13</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('13')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e13_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e13_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("13");
+          window.onload = loadOutput("13");
+        </script>
+      </div>
+
+      <!-- Exercise 14 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e14">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 14</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('14')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e14_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e14_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("14");
+          window.onload = loadOutput("14");
+        </script>
+      </div>
+
+      <!-- Exercise 15 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e15">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 15</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('15')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e15_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e15_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("15");
+          window.onload = loadOutput("15");
+        </script>
+      </div>
+
+      <!-- Exercise 16 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e16">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 16</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('16')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e16_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e16_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("16");
+          window.onload = loadOutput("16");
+        </script>
+      </div>
+
+      <!-- Exercise 17 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e17">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 17</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('17')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e17_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e17_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("17");
+          window.onload = loadOutput("17");
+        </script>
+      </div>
+
+      <!-- Exercise 18 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e18">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 18</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('18')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e18_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e18_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("18");
+          window.onload = loadOutput("18");
+        </script>
+      </div>
+
+      <!-- Exercise 19 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e19">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 19</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('19')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e19_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e19_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("19");
+          window.onload = loadOutput("19");
+        </script>
+      </div>
+
+      <!-- Exercise 20 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e20">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 20</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('20')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e20_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e20_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("20");
+          window.onload = loadOutput("20");
+        </script>
+      </div>
+
+      <!-- Exercise 21 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e21">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 21</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('21')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e21_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e21_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("21");
+          window.onload = loadOutput("21");
+        </script>
+      </div>
+
+      <!-- Exercise 22 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e22">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 22</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('22')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e22_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e22_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("22");
+          window.onload = loadOutput("22");
+        </script>
+      </div>
+
+      <!-- Exercise 23 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e23">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 23</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('23')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e23_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e23_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("23");
+          window.onload = loadOutput("23");
+        </script>
+      </div>
+
+      <!-- Exercise 24 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e24">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 24</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('24')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e24_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e24_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("24");
+          window.onload = loadOutput("24");
+        </script>
+      </div>
+
+      <!-- Exercise 25 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e25">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 25</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('25')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e25_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e25_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("25");
+          window.onload = loadOutput("25");
+        </script>
+      </div>
+
+      <!-- Exercise 26 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e26">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 26</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('26')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e26_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e26_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("26");
+          window.onload = loadOutput("26");
+        </script>
+      </div>
+
+      <!-- Exercise 27 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e27">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 27</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('27')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e27_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e27_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("27");
+          window.onload = loadOutput("27");
+        </script>
+      </div>
+
+      <!-- Exercise 28 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e28">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 28</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('28')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e28_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e28_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("28");
+          window.onload = loadOutput("28");
+        </script>
+      </div>
+
+      <!-- Exercise 29 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e29">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 29</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('29')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e29_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e29_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("29");
+          window.onload = loadOutput("29");
+        </script>
+      </div>
+
+      <!-- Exercise 30 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e30">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 30</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('30')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e30_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e30_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("30");
+          window.onload = loadOutput("30");
+        </script>
+      </div>
+
+      <!-- Exercise 31 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e31">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 31</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('31')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e31_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e31_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("31");
+          window.onload = loadOutput("31");
+        </script>
+      </div>
+
+      <!-- Exercise 32 Container -------------------------------------------------------------------------------->
+      <div class="exercise_card_container" id="e32">
+        <div class="exercise_title_container">
+          <div class="exercise_title">Exercise 32</div>
+          <button
+            type="button"
+            class="loadButtons"
+            onclick="enableOutput('32')"
+          >
+            Output
+          </button>
+        </div>
+        <div class="exercise_content_container">
+          <div class="code_input_container" id="e32_ci">Blank</div>
+          <div class="code_output_container">
+            <div id="e32_co" class="code_output" style="display: none"></div>
+          </div>
+        </div>
+        <script>
+          window.onload = loadExerciseInput("32");
+          window.onload = loadOutput("32");
+        </script>
+      </div>
+    </div>
+  </body>
+</html>

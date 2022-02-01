@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!--BODY_CHECKPOINT-->
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <script>
+      let heartfailurecsv =
+        "https://raw.githubusercontent.com/akmand/datasets/master/heart_failure.csv";
+
+      let age_1_30 = new Array();
+      let age_31_40 = new Array();
+      let age_41_60 = new Array();
+      let age_61_100 = new Array();
+
+      d3.csv(heartfailurecsv).then(function (data) {
+        data.forEach((element) => {
+          if ((element.age >= 1) & (element.age <= 30)) {
+            age_1_30.push(element);
+          }
+          if ((element.age >= 31) & (element.age <= 40)) {
+            console.log(element);
+            age_31_40.push(element);
+          }
+          if ((element.age >= 41) & (element.age <= 60)) {
+            age_41_60.push(element);
+          }
+          if ((element.age >= 61) & (element.age <= 100)) {
+            age_61_100.push(element);
+          }
+        });
+        var myData = [
+          JSON.stringify(age_1_30, null, 4),
+          JSON.stringify(age_31_40, null, 4),
+          JSON.stringify(age_41_60, null, 4),
+          JSON.stringify(age_61_100, null, 4),
+        ];
+        var p = d3
+          .select("body")
+          .selectAll("p")
+          .data(myData)
+          .text(function (d, i) {
+            return d;
+          });
+      });
+    </script>
+    <!--BODY_CHECKPOINT-->
+  </body>
+</html>
