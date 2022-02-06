@@ -137,8 +137,10 @@
       }
       // Create Random Points
 
-      file_url_1 = "./utils/exercise_26_1_data.csv";
-      file_url_2 = "./utils/exercise_26_2_data.csv";
+      file_url_1 =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_26_1_data.csv";
+      file_url_2 =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_26_2_data.csv";
       d3.csv(file_url_1).then(function (data_1) {
         d3.csv(file_url_2).then(function (data_2) {
           console.log(data_1);

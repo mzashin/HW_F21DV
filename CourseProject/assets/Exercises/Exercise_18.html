@@ -10,7 +10,8 @@
   <body id="svgShowcase">
     <!--BODY_CHECKPOINT-->
     <script>
-      let data_points_loc = "./utils/exercise_18_data.csv";
+      let data_points_loc =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_18_data.csv";
 
       d3.csv(data_points_loc).then(function (data) {
         var data_p = data.map(function (d) {
