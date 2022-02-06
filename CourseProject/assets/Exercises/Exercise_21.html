@@ -15,8 +15,6 @@
           var data_p = data.map(function (d) {
             return +d.data_points;
           });
-
-          //const data = [50, 400, 300, 900, 250, 1000];
           const width = 600;
           const barHeight = 20;
           const margin = 1;
@@ -67,18 +65,8 @@
             .scaleLinear()
             .domain([0, d3.max(data_p)])
             .range([0, width_ax]);
-          //   var yscale = d3
-          //     .scaleLinear()
-          //     .domain([0, data_p.length])
-          //     .range([[0, barHeight * data_p.length + 30]]);
-          // For Bottom Axis
           var x_axis_bottom = d3.axisBottom().scale(xscale);
-          //   var y_axis_left = d3.axisLeft().scale(yscale);
           var max_x_val = d3.max(data);
-          //   svg
-          //     .append("g")
-          //     .attr("transform", "translate(30, 30)")
-          // .call(y_axis_left);
           var xAxisTranslate = height_ax / 2 + 70;
           svg
             .append("g")
@@ -86,8 +74,10 @@
             .call(x_axis_bottom);
         });
       }
-      let data_points_loc_1 = "./utils/exercise_19_1_data.csv";
-      let data_points_loc_2 = "./utils/exercise_19_2_data.csv";
+      let data_points_loc_1 =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_19_1_data.csv";
+      let data_points_loc_2 =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_19_2_data.csv";
       drawBarChart(data_points_loc_1);
     </script>
     <!--BODY_CHECKPOINT-->
