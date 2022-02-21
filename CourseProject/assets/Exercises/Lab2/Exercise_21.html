@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body id="svgShowcase">
+    <!--BODY_CHECKPOINT-->
+    <script>
+      function drawBarChart(file_url) {
+        d3.csv(file_url).then(function (data) {
+          var data_p = data.map(function (d) {
+            return +d.data_points;
+          });
+          const width = 600;
+          const barHeight = 20;
+          const margin = 1;
+          var scale = d3
+            .scaleLinear()
+            .domain([d3.min(data_p), d3.max(data_p)])
+            .range([50, 500]);
+          var svg = d3
+            .select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", barHeight * data_p.length + 30);
+          var g = svg
+            .selectAll("g")
+            .data(data_p)
+            .enter()
+            .append("g")
+            .attr("transform", function (d, i) {
+              return "translate(30," + i * barHeight + ")";
+            });
+          g.append("rect")
+            .attr("width", function (d) {
+              return scale(d);
+            })
+            .attr("fill", function (d, i) {
+              if (d > 500) {
+                return "red";
+              } else if (d > 100) {
+                return "blue";
+              } else return "green";
+            })
+            .attr("height", barHeight - margin);
+          g.append("text")
+            .attr("x", function (d) {
+              return scale(d);
+            })
+            .attr("y", barHeight / 2)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text(function (d) {
+              return d;
+            });
+
+          const width_ax = 500;
+          const height_ax = barHeight * data_p.length;
+
+          var xscale = d3
+            .scaleLinear()
+            .domain([0, d3.max(data_p)])
+            .range([0, width_ax]);
+          var x_axis_bottom = d3.axisBottom().scale(xscale);
+          var max_x_val = d3.max(data);
+          var xAxisTranslate = height_ax / 2 + 70;
+          svg
+            .append("g")
+            .attr("transform", "translate(30, " + xAxisTranslate + ")")
+            .call(x_axis_bottom);
+        });
+      }
+      let data_points_loc_1 =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_19_1_data.csv";
+      let data_points_loc_2 =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_19_2_data.csv";
+      drawBarChart(data_points_loc_1);
+    </script>
+    <!--BODY_CHECKPOINT-->
+  </body>
+</html>

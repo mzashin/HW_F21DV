@@ -20,7 +20,7 @@ function resetAllOutput(classname) {
 function loadOutput(id) {
   // for (var i = 0; i < id.length; i += 1) {
   templateFileName =
-    "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/iframeTemplate.html";
+    "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab1/iframeTemplate.html";
   var inputTagName = "e" + id + "_ci";
   var outputTagName = "e" + id + "_co";
   d3.text(templateFileName).then(function (data) {
@@ -38,7 +38,7 @@ function loadOutput(id) {
 function loadExerciseInput(id) {
   // for (var i = 1; i < 4; i += 1) {
   exerciseFileName =
-    "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Exercise_" +
+    "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab1/Exercise_" +
     id +
     ".html";
   console.log(exerciseFileName);

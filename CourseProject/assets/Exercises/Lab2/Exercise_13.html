@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body id="svgShowcase">
+    <!--BODY_CHECKPOINT-->
+    <script>
+      let shapescsv =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/shapes.csv";
+      d3.select("body")
+        .append("div")
+        .attr("class", "ex13")
+        .append("p")
+        .classed("ex-heading", true);
+      var rectData = [];
+      var ellData = [];
+      var lineData = [];
+      var cirData = [];
+      d3.csv(shapescsv, (data) => {
+        if (data.shape == "rectangle") {
+          rectData.push(data);
+        } else if (data.shape == "ellipse") {
+          ellData.push(data);
+        } else if (data.shape == "line") {
+          lineData.push(data);
+        } else if (data.shape == "circle") {
+          cirData.push(data);
+        }
+      }).then(() => {
+        console.log(rectData);
+        console.log(ellData);
+        console.log(lineData);
+        console.log(cirData);
+        var svg = d3
+          .select("div.ex13")
+          .append("svg")
+          .attr("width", 1000)
+          .attr("height", 500)
+          .style("border", "1px solid grey");
+        svg
+          .selectAll("rect")
+          .data(rectData)
+          .enter()
+          .append("rect")
+          .attr("x", (d, i) => {
+            return d.position_x;
+          })
+          .attr("y", (d, i) => {
+            return d.position_y;
+          })
+          .attr("width", (d, i) => {
+            dimensionJson = JSON.parse(
+              d.dimension_json
+                .replace(/'/g, '"')
+                .replace(/"{/g, "'{")
+                .replace(/'{/g, '"{')
+            );
+            return dimensionJson.width;
+          })
+          .attr("height", (d, i) => {
+            dimensionJson = JSON.parse(
+              d.dimension_json
+                .replace(/'/g, '"')
+                .replace(/"{/g, "'{")
+                .replace(/'{/g, '"{')
+            );
+            return dimensionJson.height;
+          })
+          .attr("fill", (d, i) => {
+            return d.fill;
+          })
+          .attr("stroke", (d, i) => {
+            return d.stroke_color;
+          })
+          .attr("stroke-width", (d, i) => {
+            return d.stroke_width;
+          });
+        svg
+          .selectAll("ellipse")
+          .data(ellData)
+          .enter()
+          .append("ellipse")
+          .attr("cx", (d, i) => {
+            return d.position_x;
+          })
+          .attr("rx", (d, i) => {
+            dimensionJson = JSON.parse(
+              d.dimension_json
+                .replace(/'/g, '"')
+                .replace(/"{/g, "'{")
+                .replace(/'{/g, '"{')
+            );
+            return dimensionJson.rx;
+          })
+          .attr("cy", (d, i) => {
+            return d.position_y;
+          })
+          .attr("ry", (d, i) => {
+            dimensionJson = JSON.parse(
+              d.dimension_json
+                .replace(/'/g, '"')
+                .replace(/"{/g, "'{")
+                .replace(/'{/g, '"{')
+            );
+            return dimensionJson.ry;
+          })
+          .attr("fill", (d, i) => {
+            return d.fill;
+          })
+          .attr("stroke", (d, i) => {
+            return d.stroke_color;
+          })
+          .attr("stroke-width", (d, i) => {
+            return d.stroke_width;
+          });
+        svg
+          .selectAll("line")
+          .data(lineData)
+          .enter()
+          .append("line")
+          .attr("x1", (d, i) => {
+            return d.position_x;
+          })
+          .attr("x2", (d, i) => {
+            dimensionJson = JSON.parse(
+              d.dimension_json
+                .replace(/'/g, '"')
+                .replace(/"{/g, "'{")
+                .replace(/'{/g, '"{')
+            );
+            return +d.position_x + +dimensionJson.length;
+          })
+          .attr("y1", (d, i) => {
+            return d.position_y;
+          })
+          .attr("y2", (d, i) => {
+            return d.position_y;
+          })
+          .attr("stroke", (d, i) => {
+            return d.stroke_color;
+          })
+          .attr("stroke-width", (d, i) => {
+            return d.stroke_width;
+          });
+        svg
+          .selectAll("circle")
+          .data(cirData)
+          .enter()
+          .append("circle")
+          .attr("cx", (d, i) => {
+            return d.position_x;
+          })
+          .attr("cy", (d, i) => {
+            return d.position_y;
+          })
+          .attr("r", (d, i) => {
+            dimensionJson = JSON.parse(
+              d.dimension_json
+                .replace(/'/g, '"')
+                .replace(/"{/g, "'{")
+                .replace(/'{/g, '"{')
+            );
+            return dimensionJson.r;
+          })
+          .attr("fill", (d, i) => {
+            return d.fill;
+          })
+          .attr("stroke", (d, i) => {
+            return d.stroke_color;
+          })
+          .attr("stroke-width", (d, i) => {
+            return d.stroke_width;
+          });
+      });
+    </script>
+
+    <!--BODY_CHECKPOINT-->
+  </body>
+</html>

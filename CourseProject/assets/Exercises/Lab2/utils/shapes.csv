@@ -1,0 +1,5 @@
+shape,dimension_json,position_x,position_y,stroke_color,stroke_width,fill
+circle,"{'r':'100'}",200,200,red,4,yellow
+ellipse,"{'rx':'150','ry':'100'}",500,200,green,4,yellow
+rectangle,"{'width':'150','height':'100'}",750,150,blue,4,yellow
+line,"{'length':'800'}",100,400,purple,4,yellow

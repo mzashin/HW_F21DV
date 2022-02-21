@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!--BODY_CHECKPOINT-->
+    <script>
+      var myData = ["a", 4, 1, "b", 6, 2, 8, 9, "z"];
+      var p = d3
+        .select("body")
+        .selectAll("span")
+        .data(myData)
+        .enter()
+        .append("p")
+        .text(function (d, i) {
+          return "cont:" + d; // return value is used to set the 'text'
+        })
+        .style("color", function (d, i) {
+          if (/[a-zA-Z]/.test(d)) {
+            return "blue";
+          } else {
+            return "green";
+          }
+        });
+    </script>
+    <!--BODY_CHECKPOINT-->
+  </body>
+</html>
