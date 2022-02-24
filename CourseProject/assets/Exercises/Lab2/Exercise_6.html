@@ -9,28 +9,19 @@
   </head>
   <body id="e3_co">
     <!--BODY_CHECKPOINT-->
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
+    <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
     <script>
-      let otherdata = [
-        { name: "test", val: 1 },
-        { name: "other", val: 2 },
-        { name: "b", val: 3 },
-        { name: "color", val: 5 },
-      ];
-      let paragraph = d3
-        .select("body")
-        .selectAll("div")
-        .data(otherdata)
-        .text(function (d, i) {
-          console.log("d.name: " + d.name);
-          console.log("d.val: " + d.val);
-          console.log("i: " + i);
-          console.log("this: " + this);
-          return "Name: " + d.name + "  Val: " + d.val; // return value is used to set the 'text'
-        });
+      d3.select("body")
+        .append("div")
+        .style("width", "200px")
+        .style("height", "200px")
+        .style("background-color", "blue")
+        .transition()
+        .duration(1000)
+        .style("background-color", "red")
+        .transition()
+        .duration(2000)
+        .style("background-color", "green");
     </script>
     <!--BODY_CHECKPOINT-->
   </body>

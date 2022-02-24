@@ -9,48 +9,31 @@
   </head>
   <body>
     <!--BODY_CHECKPOINT-->
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
+    <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
     <script>
-      let titaniccsv =
-        "https://raw.githubusercontent.com/dsindy/kaggle-titanic/master/data/test.csv";
+      d3.select("body")
+        .append("div")
+        .style("width", "200px")
+        .style("height", "200px")
+        .style("background-color", "pink")
+        .style("transform", "scale(1.0)")
+        .transition()
+        .ease(d3.easeElastic)
+        .duration(2000)
+        .style("background-color", "lightgreen")
+        .style("transform", "scale(0.5)");
 
-      let mr_counter = 0;
-      let mrs_counter = 0;
-      let male_counter = 0;
-      let female_counter = 0;
-
-      d3.csv(titaniccsv).then(function (data) {
-        data.forEach((element) => {
-          if (element.Name.indexOf("Mr") >= 0) {
-            mr_counter += 1;
-          }
-          if (element.Name.indexOf("Mrs") >= 0) {
-            mrs_counter += 1;
-          }
-          if (element.Sex === "male") {
-            male_counter += 1;
-          }
-          if (element.Sex === "female") {
-            female_counter += 1;
-          }
-        });
-        var myData = [
-          "mr_counter: " + mr_counter,
-          "mrs_counter: " + mrs_counter,
-          "male_counter: " + male_counter,
-          "female_counter: " + female_counter,
-        ];
-        var p = d3
-          .select("body")
-          .selectAll("p")
-          .data(myData)
-          .text(function (d, i) {
-            return d;
-          });
-      });
+      d3.select("body")
+        .append("div")
+        .style("width", "200px")
+        .style("height", "200px")
+        .style("background-color", "pink")
+        .style("transform", "scale(1.0)")
+        .transition()
+        .ease(d3.easeBack)
+        .duration(2000)
+        .style("background-color", "lightgreen")
+        .style("transform", "scale(0.5)");
     </script>
     <!--BODY_CHECKPOINT-->
   </body>

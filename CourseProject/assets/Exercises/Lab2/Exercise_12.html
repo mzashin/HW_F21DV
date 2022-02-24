@@ -7,114 +7,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body id="svgShowcase">
+  <body id="e4_co">
     <!--BODY_CHECKPOINT-->
-    <div id="shape_circle"></div>
-    <div id="shape_rectangle"></div>
-    <div id="shape_ellipse"></div>
-    <div id="shape_line"></div>
+    <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
     <script>
-      //Create SVG element
-
-      let shapescsv =
-        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/shapes_12.csv";
-      d3.csv(shapescsv).then(function (data) {
-        data.forEach((element) => {
-          var shape = element.shape;
-          console.log(element.dimensions_json);
-          var dimensions_json = JSON.parse(
-            element.dimension_json
-              .replace(/'/g, '"')
-              .replace(/"{/g, "'{")
-              .replace(/'{/g, '"{')
-          );
-          var position_x = +element.position_x;
-          var position_y = +element.position_y;
-          var stroke_color = element.stroke_color;
-          var stroke_width = +element.stroke_width;
-          var fill = element.fill;
-          var svg = d3
-            .select("#shape_" + shape)
-            .append("svg")
-            .attr("width", 400)
-            .attr("height", 400)
-            .style("border", "1px solid green");
-
-          if (shape.toLowerCase() === "circle") {
-            console.log("Creating circle");
-            svg
-              .append("circle")
-              .attr("cx", position_x)
-              .attr("cy", position_y)
-              .attr("r", dimensions_json.r)
-              .attr("fill", fill)
-              .attr("stroke", stroke_color)
-              .attr("stroke-width", stroke_width);
-          } else if (shape.toLowerCase() === "ellipse") {
-            console.log("Creating ellipse");
-            console.log(
-              position_x,
-              position_y,
-              dimensions_json,
-              fill,
-              stroke_color,
-              stroke_width
-            );
-
-            svg
-              .append("ellipse")
-              .attr("cx", position_x)
-              .attr("cy", position_y)
-              .attr("rx", dimensions_json.rx)
-              .attr("ry", dimensions_json.ry)
-              .attr("fill", fill)
-              .attr("stroke", stroke_color)
-              .attr("stroke-width", stroke_width);
-          } else if (shape.toLowerCase() === "rectangle") {
-            console.log("Creating rectangle");
-            console.log(
-              position_x,
-              position_y,
-              dimensions_json,
-              fill,
-              stroke_color,
-              stroke_width
-            );
-
-            svg
-              .append("rect")
-              .attr("x", position_x)
-              .attr("y", position_y)
-              .attr("width", dimensions_json.width)
-              .attr("height", dimensions_json.height)
-              .attr("fill", fill)
-              .attr("stroke", stroke_color)
-              .attr("stroke-width", stroke_width);
-          } else if (shape.toLowerCase() === "line") {
-            console.log("Creating Line");
-            console.log(
-              position_x,
-              position_y,
-              dimensions_json,
-              fill,
-              stroke_color,
-              stroke_width
-            );
-
-            svg
-              .append("line")
-              .attr("x1", position_x)
-              .attr("y1", position_y)
-              .attr("x2", position_x + +dimensions_json.length)
-              .attr("y2", position_y)
-              .attr("fill", fill)
-              .attr("stroke", stroke_color)
-              .attr("stroke-width", stroke_width);
-          }
-        });
-      });
+      var svg = d3
+        .select("body")
+        .append("svg")
+        .attr("width", 500)
+        .attr("height", 500);
+      var bar1 = svg
+        .append("rect")
+        .attr("fill", "blue")
+        .attr("x", 100)
+        .attr("y", 20)
+        .attr("height", 20)
+        .attr("width", 10);
+      var bar2 = svg
+        .append("rect")
+        .attr("fill", "blue")
+        .attr("x", 120)
+        .attr("y", 20)
+        .attr("height", 20)
+        .attr("width", 10);
+      var bar3 = svg
+        .append("rect")
+        .attr("fill", "blue")
+        .attr("x", 140)
+        .attr("y", 20)
+        .attr("height", 20)
+        .attr("width", 10);
+      update();
+      function update() {
+        bar1
+          .transition()
+          .ease(d3.easeLinear)
+          .duration(2000)
+          .attr("height", 100);
+        bar2
+          .transition()
+          .ease(d3.easeLinear)
+          .duration(2000)
+          .delay(2000)
+          .attr("height", 100);
+        bar3
+          .transition()
+          .ease(d3.easeLinear)
+          .duration(2000)
+          .delay(4000)
+          .attr("height", 100);
+      }
     </script>
-
     <!--BODY_CHECKPOINT-->
   </body>
 </html>

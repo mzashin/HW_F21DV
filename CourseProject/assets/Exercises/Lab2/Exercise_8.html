@@ -7,25 +7,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body>
+  <body id="e4_co">
     <!--BODY_CHECKPOINT-->
     <script>
-      var myData = ["a", 4, 1, "b", 6, 2, 8, 9, "z"];
-      var p = d3
-        .select("body")
-        .selectAll("span")
-        .data(myData)
-        .enter()
-        .append("p")
-        .text(function (d, i) {
-          return "cont:" + d; // return value is used to set the 'text'
+      d3.select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("top", "100px")
+        .style("left", "100px")
+        .style("width", "200px")
+        .style("height", "200px")
+        .style("background-color", "blue");
+
+      d3.selectAll("div")
+        .on("mouseover", function (event) {
+          d3.select(this)
+            .transition()
+            .duration(1000)
+            .style("background-color", "red")
+            .style("width", "100px")
+            .style("height", "100px");
         })
-        .style("color", function (d, i) {
-          if (/[a-zA-Z]/.test(d)) {
-            return "blue";
-          } else {
-            return "green";
-          }
+        .on("mouseout", function () {
+          d3.select(this)
+            .transition()
+            .duration(2000)
+            .style("background-color", "green")
+            .style("width", "200px")
+            .style("height", "200px");
         });
     </script>
     <!--BODY_CHECKPOINT-->

@@ -7,51 +7,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body>
+  <body id="e4_co">
     <!--BODY_CHECKPOINT-->
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
     <script>
-      let heartfailurecsv =
-        "https://raw.githubusercontent.com/akmand/datasets/master/heart_failure.csv";
-
-      let age_1_30 = new Array();
-      let age_31_40 = new Array();
-      let age_41_60 = new Array();
-      let age_61_100 = new Array();
-
-      d3.csv(heartfailurecsv).then(function (data) {
-        data.forEach((element) => {
-          if ((element.age >= 1) & (element.age <= 30)) {
-            age_1_30.push(element);
-          }
-          if ((element.age >= 31) & (element.age <= 40)) {
-            console.log(element);
-            age_31_40.push(element);
-          }
-          if ((element.age >= 41) & (element.age <= 60)) {
-            age_41_60.push(element);
-          }
-          if ((element.age >= 61) & (element.age <= 100)) {
-            age_61_100.push(element);
-          }
+      let newspan = d3
+        .select("#e4_co")
+        .append("svg")
+        .attr("width", 500)
+        .attr("height", 500)
+        .append("circle")
+        .attr("cx", 100)
+        .attr("cy", 100)
+        .attr("r", 20)
+        .style("fill", "green");
+      d3.selectAll("circle")
+        .on("mouseover", function (event) {
+          d3.select(this)
+            .transition()
+            .ease(d3.easeElastic)
+            .duration(2000)
+            .style("fill", "orange")
+            .attr("r", 60);
+        })
+        .on("mouseout", function () {
+          d3.select(this)
+            .transition()
+            .ease(d3.easeElastic)
+            .duration(2000)
+            .style("fill", "lightblue")
+            .attr("r", 20);
         });
-        var myData = [
-          JSON.stringify(age_1_30, null, 4),
-          JSON.stringify(age_31_40, null, 4),
-          JSON.stringify(age_41_60, null, 4),
-          JSON.stringify(age_61_100, null, 4),
-        ];
-        var p = d3
-          .select("body")
-          .selectAll("p")
-          .data(myData)
-          .text(function (d, i) {
-            return d;
-          });
-      });
     </script>
     <!--BODY_CHECKPOINT-->
   </body>

@@ -7,18 +7,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body>
+  <body id="e3_co">
     <!--BODY_CHECKPOINT-->
-<div> Original: <br> <br> </div>
-<p>Generic paragraph</p>
-<br> <br>
-<div> Modified: <br> </div>
-<div id="e2_co_modified">
-<p>Generic paragraph</p>
-</div>
-<script>
- d3.select("#e2_co_modified").select("p").style("color", "red").style("font-family","Montserrat, sans-serif").style("font-size","30px").text("Modified Text");
-</script>
+    <style>
+      div {
+        position: relative;
+        background-color: rgb(77, 23, 202);
+        color: white;
+        padding: 5px;
+        display: none;
+        font-family: sans-serif;
+      }
+      span {
+        color: rgb(77, 23, 202);
+      }
+      span:hover + div {
+        position: absolute;
+        display: inline-block;
+        font-family: sans-serif;
+      }
+    </style>
+    <script>
+      let newelement = d3.select("#e3_co");
+      let numbers = [
+        "One",
+        "Two",
+        "Three",
+        "Four",
+        "Five",
+        "Six",
+        "Seven",
+        "Eight",
+        "Nine",
+        "Ten",
+      ];
+      for (i = 1; i <= 10; i++) {
+        newelement.append("span").text(i);
+        newelement.append("div").text("          " + numbers[i - 1]);
+        newelement.append("br");
+        newelement.append("br");
+      }
+    </script>
     <!--BODY_CHECKPOINT-->
   </body>
 </html>
