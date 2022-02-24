@@ -10,58 +10,53 @@
   <body id="svgShowcase">
     <!--BODY_CHECKPOINT-->
     <script>
-      let data_points_loc =
-        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_28_data.csv";
-
-      d3.csv(data_points_loc).then(function (data) {
-        var data_p = data.map(function (d) {
-          return +d.data_points;
-        });
-
-        //const data = [50, 400, 300, 900, 250, 1000];
-        const width = 500;
-        const barHeight = 20;
-        const margin = 1;
-        var scale = d3
-          .scaleLinear()
-          .domain([d3.min(data_p), d3.max(data_p)])
-          .range([50, 500]);
-        var svg = d3
-          .select("body")
-          .append("svg")
-          .attr("width", width)
-          .attr("height", barHeight * data_p.length);
-        var g = svg
-          .selectAll("g")
-          .data(data_p)
-          .enter()
-          .append("g")
-          .attr("transform", function (d, i) {
-            return "translate(0," + i * barHeight + ")";
-          });
-
-        var myColor4 = d3.scaleOrdinal().domain(data_p).range(d3.schemeSet3);
-
-        g.append("rect")
-          .attr("width", function (d) {
-            return scale(d);
-          })
-          .style("fill", function (d) {
-            return myColor4(+d);
-          })
-          .attr("height", barHeight - margin);
-        g.append("text")
-          .attr("x", function (d) {
-            return scale(d);
-          })
-          .attr("y", barHeight / 2)
-          .attr("dy", ".35em")
-          .style("text-anchor", "end")
-          .text(function (d) {
-            return d;
-          });
+      var width = 400,
+        height = 400;
+      // setup svg
+      d3.select("body")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+      // generate some random data
+      var numNodes = 100;
+      var nodes = d3.range(numNodes).map(function (d) {
+        return { radius: Math.random() * 25 };
       });
+      console.log(nodes);
+      var myColor = d3.scaleOrdinal().domain(nodes).range(d3.schemeSet3);
+      var simulation = d3
+        .forceSimulation(nodes)
+        .force("charge", d3.forceManyBody().strength(5))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force(
+          "collision",
+          d3.forceCollide().radius(function (d) {
+            return d.radius;
+          })
+        )
+        .on("tick", ticked);
+      function ticked() {
+        var u = d3
+          .select("svg")
+          .selectAll("circle")
+          .data(nodes)
+          .join("circle")
+          .attr("fill", function (d) {
+            return myColor(+d.radius);
+          })
+          .attr("r", function (d) {
+            return d.radius;
+          })
+          .attr("cx", function (d) {
+            return d.x;
+          })
+          .attr("cy", function (d) {
+            return d.y;
+          });
+      }
+      console.log("ready..");
     </script>
+
     <!--BODY_CHECKPOINT-->
   </body>
 </html>

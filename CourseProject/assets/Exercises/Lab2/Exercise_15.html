@@ -19,6 +19,8 @@
     </style>
     <svg width="600" height="500"></svg>
     <script>
+      let csv_loc =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab2/utils/exercise_15_data.csv";
       var svg = d3.select("svg");
       var margin = 200;
       var width = svg.attr("width") - margin;
@@ -35,7 +37,7 @@
       var g = svg
         .append("g")
         .attr("transform", "translate(" + 100 + "," + 100 + ")");
-      d3.csv(csvfile.csv).then(function (data) {
+      d3.csv(csv_loc).then(function (data) {
         x.domain(
           data.map(function (d) {
             return d.year;
@@ -79,6 +81,8 @@
           .append("rect")
           .attr("class", "bar")
           // .on(….. ) – call mouse events here…
+          .on("mouseover", onMouseOver)
+          .on("mouseout", onMouseOut)
           .attr("x", function (d) {
             return x(d.year);
           })
@@ -96,6 +100,47 @@
             return height - y(d.value);
           });
       });
+
+      function onMouseOver(d, i) {
+        d3.select(this).attr("class", "highlight");
+        d3.select(this)
+          .transition() // adds animation
+          .duration(400)
+          .attr("width", x.bandwidth() + 5)
+          .attr("y", function (d) {
+            return y(d.value) - 10;
+          })
+          .attr("height", function (d) {
+            return height - y(d.value) + 10;
+          });
+        g.append("text")
+          .attr("class", "val")
+          .attr("x", function () {
+            return x(d.year);
+          })
+          .attr("y", function () {
+            return y(d.value) - 15;
+          })
+          .text(function (d) {
+            return "$" + i.value;
+          }); // Value of the text
+      }
+      //mouseout event handler function
+      function onMouseOut(d, i) {
+        // use the text label class to remove label on mouseout
+        d3.select(this).attr("class", "bar");
+        d3.select(this)
+          .transition() // adds animation
+          .duration(400)
+          .attr("width", x.bandwidth())
+          .attr("y", function (d) {
+            return y(i.value);
+          })
+          .attr("height", function (d) {
+            return height - y(i.value);
+          });
+        d3.selectAll(".val").remove();
+      }
     </script>
     <!--BODY_CHECKPOINT-->
   </body>

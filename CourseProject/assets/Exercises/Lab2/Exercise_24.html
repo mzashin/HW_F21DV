@@ -7,109 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body id="svgShowcase">
+  <body id="e24_co_modified">
     <!--BODY_CHECKPOINT-->
     <script>
-      function createLineChart(data, data_2, line_color_1, line_color_2) {
-        // Set Dimensions
-        const xSize = 600;
-        const ySize = 600;
-        const margin = 40;
-        const xMax = xSize - margin * 2;
-        const yMax = ySize - margin * 2;
+      let intr = d3.interpolate([20, 40, 4], [1, 12, 10]);
+      console.log("Type of returned function is: ", typeof intr);
+      console.log(intr(0.2));
 
-        // Get the 'limits' of the data - the full extent (mins and max)
-        // so the plotted data fits perfectly
-        const xExtent = d3.extent(data_2, (d) => {
-          return d.x;
-        });
-        const yExtent = d3.extent(data_2, (d) => {
-          return d.y;
-        });
-        // Append SVG Object to the Page
-        const svg = d3
-          .select("body")
-          .append("svg")
-          .attr("width", xSize)
-          .attr("height", ySize)
-          .append("g")
-          .attr("transform", "translate(" + margin + "," + margin + ")");
-        // X Axis
-        const x = d3
-          .scaleLinear()
-          .domain([xExtent[0], xExtent[1]])
-          .range([0, xMax]);
-        // bottom
-        svg
-          .append("g")
-          .attr("transform", "translate(0," + yMax + ")")
-          .call(d3.axisBottom(x))
-          .attr("color", "green"); // make bottom axis green
-        // top
-        svg.append("g").call(d3.axisTop(x));
-        // Y Axis
-        const y = d3
-          .scaleLinear()
-          .domain([yExtent[0], yExtent[1]])
-          .range([yMax, 0]);
-        // left y axis
-        svg.append("g").call(d3.axisLeft(y));
-        // right y axis
-        svg
-          .append("g")
-          .attr("transform", `translate(${yMax},0)`)
-          .call(d3.axisRight(y));
-        // Add the line 1
-        svg
-          .append("path")
-          .datum(data)
-          .attr("fill", "none")
-          .attr("stroke", line_color_1)
-          .attr("stroke-width", 1.5)
-          .attr(
-            "d",
-            d3
-              .line()
-              .x(function (d) {
-                return x(d.x);
-              })
-              .y(function (d) {
-                return y(d.y);
-              })
-          );
-        // Add the line 2
-        svg
-          .append("path")
-          .datum(data_2)
-          .attr("fill", "none")
-          .attr("stroke", line_color_2)
-          .attr("stroke-width", 1.5)
-          .attr(
-            "d",
-            d3
-              .line()
-              .x(function (d) {
-                return x(d.x);
-              })
-              .y(function (d) {
-                return y(d.y);
-              })
-          );
-      }
-      // Create Random Points
-
-      file_url_1 =
-        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_24_1_data.csv";
-      file_url_2 =
-        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_24_2_data.csv";
-      d3.csv(file_url_1).then(function (data_1) {
-        d3.csv(file_url_2).then(function (data_2) {
-          console.log(data_1);
-          var line_color_1 = "steelblue";
-          var line_color_2 = "red";
-          createLineChart(data_1, data_2, line_color_1, line_color_2);
-        });
-      });
+      document.getElementById("e24_co_modified").innerHTML =
+        document.getElementById("e24_co_modified").innerHTML +
+        "console.log('Type of returned function is: '', typeof intr) :  " +
+        typeof intr +
+        "<br> <br>" +
+        "console.log(intr(0.2)) : " +
+        intr(0.2);
     </script>
     <!--BODY_CHECKPOINT-->
   </body>

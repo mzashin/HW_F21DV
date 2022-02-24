@@ -9,114 +9,54 @@
   </head>
   <body id="svgShowcase">
     <!--BODY_CHECKPOINT-->
-    <script>
-      function createLineChart(data, line_color) {
-        // Set Dimensions
-        const xSize = 600;
-        const ySize = 600;
-        const margin = 40;
-        const xMax = xSize - margin * 2;
-        const yMax = ySize - margin * 2;
 
-        // Get the 'limits' of the data - the full extent (mins and max)
-        // so the plotted data fits perfectly
-        const xExtent = d3.extent(data, (d) => {
-          return d.x;
-        });
-        const yExtent = d3.extent(data, (d) => {
-          return d.y;
-        });
-        // Append SVG Object to the Page
-        const svg = d3
-          .select("body")
-          .append("svg")
-          .attr("width", xSize)
-          .attr("height", ySize)
-          .append("g")
-          .attr("transform", "translate(" + margin + "," + margin + ")");
-        // X Axis
-        const x = d3
-          .scaleLinear()
-          .domain([xExtent[0], xExtent[1]])
-          .range([0, xMax]);
-        // bottom
-        svg
-          .append("g")
-          .attr("transform", "translate(0," + yMax + ")")
-          .call(d3.axisBottom(x))
-          .attr("color", "green"); // make bottom axis green
-        // top
-        svg.append("g").call(d3.axisTop(x));
-        // Y Axis
-        const y = d3
-          .scaleLinear()
-          .domain([yExtent[0], yExtent[1]])
-          .range([yMax, 0]);
-        // left y axis
-        svg.append("g").call(d3.axisLeft(y));
-        // right y axis
-        svg
-          .append("g")
-          .attr("transform", `translate(${yMax},0)`)
-          .call(d3.axisRight(y));
-        // Add the line
-        svg
+    <button onclick="update(dataset_1)">Variable 1</button>
+    <button onclick="update(dataset_2)">Variable 2</button>
+    <script>
+      var dataset_1 = {
+        apples: [5345, 2879, 1997, 2437, 4045],
+      };
+      var dataset_2 = {
+        apples: [2885, 1124, 4999, 345, 3434],
+      };
+      var width = 460,
+        height = 300,
+        radius = Math.min(width, height) / 2;
+      var color = d3.scaleOrdinal().range(d3.schemeSet3);
+      var pie = d3.pie().sort(null);
+      var arc = d3
+        .arc()
+        .innerRadius(radius - 100)
+        .outerRadius(radius - 50);
+      var svg = d3
+        .select("body")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+      function update(data) {
+        var u = svg.selectAll("path").data(pie(data.apples));
+
+        u.enter()
           .append("path")
-          .datum(data)
-          .attr("fill", "none")
-          .attr("stroke", line_color)
-          .attr("stroke-width", 1.5)
-          .attr(
-            "d",
-            d3
-              .line()
-              .x(function (d) {
-                return x(d.x);
-              })
-              .y(function (d) {
-                return y(d.y);
-              })
-          );
-        svg
-          .selectAll("dot")
-          .data(data)
-          .enter()
-          .append("circle")
-          .attr("cx", function (d) {
-            return x(d.x);
+          .merge(u)
+          .transition()
+          .duration(1000)
+          .attr("fill", function (d, i) {
+            return color(i);
           })
-          .attr("cy", function (d) {
-            return y(d.y);
-          })
-          .attr("r", 5)
-          .style("fill", "red");
-        svg
-          .selectAll("dot")
-          .data(data)
-          .enter()
-          .append("text")
-          .attr("x", function (d) {
-            return x(d.x);
-          })
-          .attr("y", function (d) {
-            return y(d.y);
-          })
-          .attr("dy", ".35em")
-          .style("color", "purple")
-          .style("font-size", "10")
-          .text(function (d) {
-            return x(d.x).toFixed(1) + "," + y(d.y).toFixed(2);
+          .attr("d", arc)
+          .attrTween("d", function (d) {
+            var i = d3.interpolate(d.endAngle, d.startAngle);
+            return function (t) {
+              d.startAngle = i(t);
+              return arc(d);
+            };
           });
       }
-      // Create Random Points
-
-      file_url =
-        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/utils/exercise_27_data.csv";
-      d3.csv(file_url).then(function (data) {
-        console.log(data);
-        var line_color = "steelblue";
-        createLineChart(data, line_color);
-      });
+      update(dataset_1);
     </script>
     <!--BODY_CHECKPOINT-->
   </body>
