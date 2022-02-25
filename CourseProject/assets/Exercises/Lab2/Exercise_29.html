@@ -10,24 +10,28 @@
   <body id="svgShowcase">
     <!--BODY_CHECKPOINT-->
     <script>
-      var dataset = {
-        radius: [23, 25, 21, 65, 2, 56, 200, 23, 12, 7, 334, 24, 134],
-      };
-      var width = 400,
-        height = 400;
+      var width = 800,
+        height = 800;
       // setup svg
       d3.select("body")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
       // generate some random data
-      var numNodes = 100;
-      //var nodes = d3.range(numNodes).map(function (d) {
-      //  return { radius: Math.random() * 25 };
-      //});
-      var myColor = d3.scaleOrdinal().domain(dataset).range(d3.schemeSet3);
+      var nodes = [
+        11, 27, 35, 38, 39, 24, 48, 20, 13, 30, 12, 3, 14, 26, 2, 16, 41, 36,
+        50, 29, 50, 35, 4, 43, 24, 37, 36, 48, 3, 31, 16, 34, 22, 42, 40, 40, 5,
+        10, 30, 27, 43, 17, 10, 5, 44, 16, 18, 30, 46, 33, 1, 4, 41, 47, 42, 25,
+        1, 14, 30, 21, 36, 24, 34, 11, 14, 32, 48, 9, 20, 34, 26, 15, 28, 33,
+        35, 34, 25, 30, 28, 44, 34, 45, 8, 23, 35, 38, 3, 11, 13, 3, 17, 39, 41,
+        47, 34, 39, 8, 1, 41, 37,
+      ].map(function (d) {
+        return { radius: d };
+      });
+      console.log(nodes);
+      var myColor = d3.scaleOrdinal().domain(nodes).range(d3.schemeSet3);
       var simulation = d3
-        .forceSimulation(dataset)
+        .forceSimulation(nodes)
         .force("charge", d3.forceManyBody().strength(5))
         .force("center", d3.forceCenter(width / 2, height / 2))
         .force(
@@ -41,7 +45,7 @@
         var u = d3
           .select("svg")
           .selectAll("circle")
-          .data(dataset)
+          .data(nodes)
           .join("circle")
           .attr("fill", function (d) {
             return myColor(+d.radius);

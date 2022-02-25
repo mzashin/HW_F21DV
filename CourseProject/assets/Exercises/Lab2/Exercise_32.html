@@ -10,92 +10,89 @@
   <body id="svgShowcase">
     <!--BODY_CHECKPOINT-->
     <script>
-      function createLineChart(data, line_color) {
-        // Set Dimensions
-        const xSize = 600;
-        const ySize = 600;
-        const margin = 40;
-        const xMax = xSize - margin * 2;
-        const yMax = ySize - margin * 2;
+      var width = 800,
+        height = 800;
+      // setup svg
+      d3.select("body")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
-        // Get the 'limits' of the data - the full extent (mins and max)
-        // so the plotted data fits perfectly
-        const xExtent = d3.extent(data, (d) => {
-          return d.x;
-        });
-        const yExtent = d3.extent(data, (d) => {
-          return d.y;
-        });
-        // Append SVG Object to the Page
-        const svg = d3
-          .select("body")
-          .append("svg")
-          .attr("width", xSize)
-          .attr("height", ySize)
-          .append("g")
-          .attr("transform", "translate(" + margin + "," + margin + ")");
-        // X Axis
-        const x = d3
-          .scaleLinear()
-          .domain([xExtent[0], xExtent[1]])
-          .range([0, xMax]);
-        // bottom
-        svg
-          .append("g")
-          .attr("transform", "translate(0," + yMax + ")")
-          .call(d3.axisBottom(x))
-          .attr("color", "green"); // make bottom axis green
-        // top
-        svg.append("g").call(d3.axisTop(x));
-        // Y Axis
-        const y = d3
-          .scaleLinear()
-          .domain([yExtent[0], yExtent[1]])
-          .range([yMax, 0]);
-        // left y axis
-        svg.append("g").call(d3.axisLeft(y));
-        // right y axis
-        svg
-          .append("g")
-          .attr("transform", `translate(${yMax},0)`)
-          .call(d3.axisRight(y));
-        svg
-          .append("svg:image")
-          .attr("xlink:href", "./utils/Sprinkle.svg")
-          .attr("width", xSize - margin * 2)
-          .attr("height", ySize - margin * 2)
-          .attr("x", 0)
-          .attr("y", 0);
-        // Add the line
-        svg
-          .append("path")
-          .datum(data)
-          .attr("fill", "none")
-          .attr("stroke", line_color)
-          .attr("stroke-width", 1.5)
-          .attr(
-            "d",
-            d3
-              .line()
-              .x(function (d) {
-                return x(d.x);
-              })
-              .y(function (d) {
-                return y(d.y);
-              })
-          );
-      }
-      // Create Random Points
+      var div = d3
+        .select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+      // generate some random data
+      var nodes = [
+        11, 27, 35, 38, 39, 24, 48, 20, 13, 30, 12, 3, 14, 26, 2, 16, 41, 36,
+      ].map(function (d) {
+        return { radius: d };
+      });
+      console.log(nodes);
+      var myColor = d3.scaleOrdinal().domain(nodes).range(d3.schemeSet3);
+      var simulation = d3
+        .forceSimulation(nodes)
+        .force("charge", d3.forceManyBody().strength(1))
+        .force(
+          "center",
+          d3
+            .forceRadial(width / 4)
+            .x(width / 2)
+            .y(height / 2)
+        )
+        .force(
+          "collision",
+          d3.forceCollide().radius(function (d) {
+            return d.radius;
+          })
+        )
+        .on("tick", ticked);
+      function ticked() {
+        var u = d3
+          .select("svg")
+          .selectAll("circle")
+          .data(nodes)
+          .join("circle")
+          .attr("fill", function (d) {
+            return myColor(+d.radius);
+          })
+          .attr("r", function (d) {
+            return d.radius;
+          })
+          .attr("cx", function (d) {
+            return d.x;
+          })
+          .attr("cy", function (d) {
+            return d.y;
+          });
 
-      const numPoints = 100;
-      const data = [];
-      for (let i = 0; i < numPoints; i++) {
-        data.push({ x: i / 100, y: Math.sin((6.2 * i) / 100) });
+        d3.selectAll("circle")
+          .on("mousemove", function (event, d) {
+            d3.select(this).style("fill", "black");
+            div.transition().duration(100).style("opacity", 0.9);
+            div
+              .style("position", "absolute")
+              .style("display", "inline")
+              .style("top", event.pageY + 10 + "px")
+              .style("left", event.pageX + 10 + "px")
+              .style("padding", "10px")
+              .style("background-color", "white")
+              .attr("x", d3.pointer(event)[0] + "px")
+              .attr("y", d3.pointer(event)[1] + "px")
+              .text(+d.radius);
+            console.log(d3.pointer(event));
+          })
+          .on("mouseout", function () {
+            d3.selectAll(".tooltip").style("display", "none");
+
+            d3.select(this).style("fill", function (d) {
+              return myColor(+d.radius);
+            });
+          });
       }
-      console.log(data);
-      var line_color = "steelblue";
-      createLineChart(data, line_color);
     </script>
+
     <!--BODY_CHECKPOINT-->
   </body>
 </html>
