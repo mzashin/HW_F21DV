@@ -9,90 +9,53 @@
   </head>
   <body id="svgShowcase">
     <!--BODY_CHECKPOINT-->
+    <!DOCTYPE html>
+    <meta charset="utf-8" />
+    <svg width="800" height="800" viewBox="-480 -250 1200 800"></svg>
     <script>
-      var width = 800,
-        height = 800;
-      // setup svg
-      d3.select("body")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
+      var nodes = [].concat(
+        d3.range(80).map(function () {
+          return { type: "a" };
+        }),
+        d3.range(160).map(function () {
+          return { type: "b" };
+        })
+      );
 
-      var div = d3
-        .select("body")
-        .append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
-      // generate some random data
-      var nodes = [
-        11, 27, 35, 38, 39, 24, 48, 20, 13, 30, 12, 3, 14, 26, 2, 16, 41, 36,
-      ].map(function (d) {
-        return { radius: d };
-      });
-      console.log(nodes);
-      var myColor = d3.scaleOrdinal().domain(nodes).range(d3.schemeSet3);
+      var node = d3
+        .select("svg")
+        .append("g")
+        .selectAll("circle")
+        .data(nodes)
+        .enter()
+        .append("circle")
+        .attr("r", d3.randomUniform(1, 15))
+        .style("padding", "5px")
+        .attr("fill", function (d) {
+          return d.type === "a" ? "lightgreen" : "pink";
+        });
+
       var simulation = d3
         .forceSimulation(nodes)
-        .force("charge", d3.forceManyBody().strength(1))
+        .force("charge", d3.forceCollide().radius(15))
         .force(
-          "center",
-          d3
-            .forceRadial(width / 4)
-            .x(width / 2)
-            .y(height / 2)
-        )
-        .force(
-          "collision",
-          d3.forceCollide().radius(function (d) {
-            return d.radius;
+          "r",
+          d3.forceRadial(function (d) {
+            return d.type === "a" ? 150 : 200;
           })
         )
         .on("tick", ticked);
+
       function ticked() {
-        var u = d3
-          .select("svg")
-          .selectAll("circle")
-          .data(nodes)
-          .join("circle")
-          .attr("fill", function (d) {
-            return myColor(+d.radius);
-          })
-          .attr("r", function (d) {
-            return d.radius;
-          })
+        node
           .attr("cx", function (d) {
             return d.x;
           })
           .attr("cy", function (d) {
             return d.y;
           });
-
-        d3.selectAll("circle")
-          .on("mousemove", function (event, d) {
-            d3.select(this).style("fill", "black");
-            div.transition().duration(100).style("opacity", 0.9);
-            div
-              .style("position", "absolute")
-              .style("display", "inline")
-              .style("top", event.pageY + 10 + "px")
-              .style("left", event.pageX + 10 + "px")
-              .style("padding", "10px")
-              .style("background-color", "white")
-              .attr("x", d3.pointer(event)[0] + "px")
-              .attr("y", d3.pointer(event)[1] + "px")
-              .text(+d.radius);
-            console.log(d3.pointer(event));
-          })
-          .on("mouseout", function () {
-            d3.selectAll(".tooltip").style("display", "none");
-
-            d3.select(this).style("fill", function (d) {
-              return myColor(+d.radius);
-            });
-          });
       }
     </script>
-
     <!--BODY_CHECKPOINT-->
   </body>
 </html>
