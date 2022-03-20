@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v6.js"></script>
+<script src="./dataFiltering.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+<button
+  onclick="createStackedLineChart('https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv', ['total_cases','total_vaccinations','total_deaths','hosp_patients'], 'Germany')"
+>
+  Germany
+</button>
+<button
+  onclick="createStackedLineChart('https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv', ['total_cases','total_vaccinations','total_deaths','hosp_patients'], 'Russia')"
+>
+  Russia
+</button>
+<button
+  onclick="createStackedLineChart('https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv', ['total_cases','total_vaccinations','total_deaths','hosp_patients'], 'India')"
+>
+  India
+</button>
+
+<script>
+  // set the dimensions and margins of the graph
+  const margin = { top: 60, right: 230, bottom: 50, left: 100 },
+    width = 1500 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+  // Initialize the plot with the first dataset
+  location_sel = "India";
+  //property_list = ['new_cases','total_deaths','people_fully_vaccinated_per_hundred']
+  property_list = [
+    "total_cases",
+    "total_vaccinations",
+    "total_deaths",
+    "hosp_patients",
+  ];
+
+  csv_loc =
+    "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv";
+
+  // Add X axis
+
+  // append the svg object to the body of the page
+  const svg = d3
+    .select("#my_dataviz")
+    .append("svg")
+    .attr("width", width + margin.right)
+    .attr("height", height * 2 + margin.top + margin.bottom)
+    .style("border", "solid")
+    .style("border-width", "5px")
+    .style("border-radius", "10px")
+    .style("padding", "5px")
+    .style("border-color", "brown")
+    .append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  const x = d3.scaleTime().range([0, width]);
+  const y = d3.scaleLinear().range([height, 0]);
+  const xAxis = svg.append("g").attr("transform", `translate(0, ${height})`);
+  const yAxis = svg.append("g");
+
+  // Add X axis label:
+  svg
+    .append("text")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height + 40)
+    .text("Time (year)");
+
+  // Add Y axis label:
+  svg
+    .append("text")
+    .attr("text-anchor", "end")
+    .attr("x", 0)
+    .attr("y", -20)
+    .text("Stats Evolution")
+    .attr("text-anchor", "start");
+
+  // Parse the Data
+  function createStackedLineChart(csv_loc, property_list, location_sel) {
+    dataFilterMultiPropertyStackedChart(
+      csv_loc,
+      property_list,
+      location_sel
+    ).then(function (data) {
+      //d3.csv(
+      //  "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered_wide.csv"
+      //).then(function (data) {
+      //////////
+      // GENERAL //
+      //////////
+
+      x.domain(
+        d3.extent(data, function (d) {
+          return d.date;
+        })
+      );
+
+      xAxis.call(d3.axisBottom(x).ticks(5));
+
+      var max = 0;
+      property_list.forEach(function (property, i) {
+        var max_y = d3.max(data, function (d) {
+          return d[property];
+        });
+        console.log("max prop: ", property, " ", max_y);
+        if (max < max_y) {
+          max = max_y;
+        }
+      });
+
+      console.log("max y", max);
+
+      y.domain([0, +max]);
+      yAxis.call(d3.axisLeft(y).ticks(5));
+
+      // List of groups = header of the csv files
+      const keys = property_list;
+
+      // color palette
+      const color = d3.scaleOrdinal().domain(keys).range(d3.schemeSet2);
+
+      //stack the data?
+      const stackedData = d3.stack().keys(keys)(data);
+      console.log("stackedData", stackedData);
+
+      //////////
+      // AXIS //
+      //////////
+
+      //////////
+      // BRUSHING AND CHART //
+      //////////
+
+      // Add a clipPath: everything out of this area won't be drawn.
+      const clip = svg
+        .append("defs")
+        .append("svg:clipPath")
+        .attr("id", "clip")
+        .append("svg:rect")
+        .attr("width", width)
+        .attr("height", height + 5)
+        .attr("x", 0)
+        .attr("y", -5);
+
+      // Add brushing
+      const brush = d3
+        .brushX() // Add the brush feature using the d3.brush function
+        .extent([
+          [0, -5],
+          [width, height + 5],
+        ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+        .on("end", updateChart); // Each time the brush selection changes, trigger the 'updateChart' function
+
+      // Create the scatter variable: where both the circles and the brush take place
+      const areaChart = svg.append("g").attr("clip-path", "url(#clip)");
+
+      // Area generator
+      const area = d3
+        .area()
+        .x(function (d) {
+          //console.log("date", d.data.date);
+          return x(d.data.date);
+        })
+        .y0(function (d) {
+          //console.log("d[0]", d[0]);
+          return y(d[0]);
+        })
+        .y1(function (d) {
+          //console.log("d[1]", d[1]);
+          return y(d[1]);
+        });
+
+      svg.selectAll(".myArea").remove();
+
+      // Show the areasremove
+      areaChart
+        .selectAll("mylayers")
+        .data(stackedData)
+        .join("path")
+        .attr("class", function (d) {
+          return "myArea " + d.key;
+        })
+        .style("fill", function (d) {
+          return color(d.key);
+        })
+        .attr("d", area);
+
+      // Add the brushing
+      areaChart.append("g").attr("class", "brush").call(brush);
+
+      let idleTimeout;
+      function idled() {
+        idleTimeout = null;
+      }
+
+      // A function that update the chart for given boundaries
+      function updateChart(event, d) {
+        extent = event.selection;
+
+        // If no selection, back to initial coordinate. Otherwise, update X axis domain
+        if (!extent) {
+          if (!idleTimeout) return (idleTimeout = setTimeout(idled, 350)); // This allows to wait a little bit
+          x.domain(
+            d3.extent(data, function (d) {
+              return d.date;
+            })
+          );
+        } else {
+          x.domain([x.invert(extent[0]), x.invert(extent[1])]);
+          areaChart.select(".brush").call(brush.move, null); // This remove the grey brush area as soon as the selection has been done
+        }
+
+        // Update axis and area position
+        xAxis.transition().duration(1000).call(d3.axisBottom(x).ticks(5));
+        areaChart.selectAll("path").transition().duration(1000).attr("d", area);
+      }
+
+      //////////
+      // HIGHLIGHT GROUP //
+      //////////
+
+      // What to do when one group is hovered
+      const highlight = function (event, d) {
+        // reduce opacity of all groups
+        d3.selectAll(".myArea").style("opacity", 0.1);
+        // expect the one that is hovered
+        d3.select("." + d).style("opacity", 1);
+      };
+
+      // And when it is not hovered anymore
+      const noHighlight = function (event, d) {
+        d3.selectAll(".myArea").style("opacity", 1);
+      };
+
+      //////////
+      // LEGEND //
+      //////////
+
+      // Add one dot in the legend for each name.
+      const size = 20;
+      svg
+        .selectAll("myrect")
+        .data(keys)
+        .join("rect")
+        .attr("x", 0)
+        .attr("y", function (d, i) {
+          return height + 40 + i * (size + 5);
+        }) // 100 is where the first dot appears. 25 is the distance between dots
+        .attr("width", size)
+        .attr("height", size)
+        .style("fill", function (d) {
+          return color(d);
+        })
+        .on("mouseover", highlight)
+        .on("mouseleave", noHighlight);
+
+      // Add one dot in the legend for each name.
+      svg
+        .selectAll("mylabels")
+        .data(keys)
+        .join("text")
+        .attr("x", 0 + size * 1.2)
+        .attr("y", function (d, i) {
+          return height + 40 + i * (size + 5) + size / 2;
+        }) // 100 is where the first dot appears. 25 is the distance between dots
+        .style("fill", function (d) {
+          return color(d);
+        })
+        .text(function (d) {
+          return d;
+        })
+        .attr("text-anchor", "left")
+        .style("alignment-baseline", "middle")
+        .on("mouseover", highlight)
+        .on("mouseleave", noHighlight);
+    });
+  }
+  createStackedLineChart(csv_loc, property_list, location_sel);
+</script>

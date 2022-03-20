@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+  <script src="https://d3js.org/d3.v7.js"></script>
+  <script src="./assets/Exercises/Lab3/dataGrpingAllCountries.js"></script>
+  <script src="./assets/Exercises/Lab3/dataFiltering.js"></script>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700"
+    />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="./assets/docs/dashboardIconV3.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="./assets/css/css_main.css" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="./assets/js/script_src.js"></script>
+    <title>CW - Lab3</title>
+  </head>
+
+  <body
+    class="body_main"
+    style="background-image: None; background-color: #2c3949"
+  >
+    <a name="top"></a>
+    <a href="#top" class="BackToTopButtons"
+      >Return to <br />
+      top of <br />
+      Page</a
+    >
+    <nav class="nav">
+      <ul class="nav__list">
+        <li class="nav__listlogo">
+          <a href="https://www.hw.ac.uk/dubai/" target="_blank"
+            ><img src="././assets/docs/download.png" alt="heriottwatt_logo"
+          /></a>
+        </li>
+        <a href="./index_home.html"><li class="nav__listitem">Home</li></a>
+        <li class="nav__listitem">
+          CourseWork
+          <ul class="nav__listitemdrop">
+            <a href="./lab1.html"><li>Lab 1</li></a>
+            <a href="./lab2.html"><li>Lab 2</li></a>
+            <a href="./lab3.html"><li>Lab 3</li></a>
+          </ul>
+        </li>
+        <li class="nav__listitem">
+          Links
+          <ul class="nav__listitemdrop">
+            <a href="https://github.com/mzashin/HW_F21DV" target="_blank"
+              ><li>
+                <i style="font-size: 18px" class="fa">&#xf09b;</i> GitHub
+              </li></a
+            >
+          </ul>
+        </li>
+        <a href="./student_info.html"
+          ><li class="nav__listitem">Student Info</li></a
+        >
+      </ul>
+    </nav>
+
+    <div class="exercise_parent_container">
+      <div class="exercise_card_container" id="lab2_header">
+        <div class="exercise_title_container" style="background-color: white">
+          <div class="lab_title" style="color: #2c3949">
+            Lab 3 - SARS Covid - 19 Dashboard
+          </div>
+          <a
+            href="./assets/docs/Lab3 - Dataset Visualisation & Analytics v1.1.pdf"
+            class="loadButtons"
+            target="_blank"
+          >
+            Lab Pdf
+          </a>
+          <a
+            href="https://canvas.hw.ac.uk/courses/5296/assignments/67275"
+            class="loadButtons"
+            target="_blank"
+            >Canvas Link</a
+          >
+        </div>
+      </div>
+    </div>
+    <div class="exercise_parent_container">
+      <div>
+        <span id="bubble_chart_1"></span>
+        <span id="bubble_chart_2"></span>
+      </div>
+
+      <div>
+        <span id="bubble_chart_3"></span>
+        <span id="bubble_chart_4"></span>
+      </div>
+      <div>
+        <span id="line_chart_1"></span>
+      </div>
+      <div>
+        <span id="map_chart_1"></span>
+      </div>
+      <div>
+        <span id="stack_chart_1"></span>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    csv_loc =
+      "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv";
+
+    function createBubbleChart(csv_loc, property, span_id, g_title) {
+      const width = 600;
+      const height = 460;
+
+      // append the svg object to the body of the page
+
+      // create a tooltip
+      const Tooltip = d3
+        .select(span_id)
+        .append("span")
+        .style("opacity", 0)
+        .attr("class", "tooltip")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "2px")
+        .style("border-radius", "5px")
+        .style("padding", "5px")
+        .style("position", "absolute");
+
+      const svg = d3
+        .select(span_id)
+        .append("svg")
+        .style("background-color", "white")
+        .attr("width", width)
+        .attr("height", height)
+        .style("border", "solid")
+        .style("border-width", "5px")
+        .style("border-radius", "10px")
+        .style("padding", "5px")
+        .style("border-color", "brown");
+
+      svg
+        .append("rect")
+        .attr("width", 580)
+        .attr("height", 20)
+        .attr("x", 10)
+        .attr("y", 0)
+        .attr("fill", "brown");
+
+      svg
+        .append("text")
+        .attr("x", 230)
+        .attr("y", 15)
+        .style("fill", "white")
+        .text(g_title);
+      svg
+        .append("rect")
+        .attr("width", 300)
+        .attr("height", 20)
+        .attr("x", 150)
+        .attr("y", 25)
+        .attr("fill", "green");
+
+      svg
+        .append("text")
+        .attr("x", 190)
+        .attr("y", 40)
+        .style("fill", "white")
+        .text("Click to View Evolution Below");
+
+      // Read data
+      fetch_property_stats(csv_loc, property).then(function (data) {
+        const color = d3.scaleOrdinal(d3.schemePaired);
+
+        // Size scale for countries
+        const size = d3
+          .scaleLinear()
+          .domain([0, d3.max(data, (d) => d.value)])
+          .range([7, 20]); // circle will be between 7 and 55 px wide
+
+        // Three function that change the tooltip when user hover / move / leave a cell
+        const mouseover = function (event, d) {
+          Tooltip.style("opacity", 1);
+          class_name = "." + d.key.replace(/[^a-z0-9]/gi, "") + "Node";
+          console.log("Selected class:", class_name);
+          d3.selectAll(class_name)
+            .style("opacity", 0.5)
+            .style("stroke-width", 10)
+            .attr("stroke", "blue");
+        };
+        const mousemove = function (event, d) {
+          Tooltip.html(
+            "<u>" + d.property + " - " + d.key + "</u>" + " : " + d.value
+          )
+            .style("left", event.pageX + 10 + "px")
+            //.style("left", 0 + "px")
+            .style("top", event.pageY + 10 + "px");
+        };
+        var mouseleave = function (event, d) {
+          Tooltip.style("opacity", 0);
+          class_name = "." + d.key.replace(/[^a-z0-9]/gi, "") + "Node";
+          console.log("Selected class:", class_name);
+          d3.selectAll(class_name)
+            .style("opacity", 1)
+            .style("stroke-width", 1)
+            .attr("stroke", "black");
+        };
+        var clickfunction = function (event, d) {
+          console.log("d", d);
+          console.log("event", event);
+          span_id = "#line_chart_1";
+          color_name = color(d.key);
+          d3.select(span_id).selectAll(".line_1").remove();
+          d3.select(span_id).selectAll(".line_2").remove();
+          createLineChart(csv_loc, d.key, d.property, span_id, color_name);
+        };
+
+        // Initialize the circle: all located at the center of the svg area
+        var node = svg
+          .append("g")
+          .selectAll("circle")
+          .data(data)
+          .join("circle")
+          //.attr("class", "node")
+          .attr("class", (d) => {
+            class_name = d.key.replace(/[^a-z0-9]/gi, "") + "Node";
+            console.log("Defined CLass:", class_name);
+            return class_name;
+          })
+          //.classed((d) => d.key.replace(/\s/g, "") + "_node", true)
+          .attr("r", (d) => size(d.value))
+          .attr("cx", width / 2)
+          .attr("cy", height / 2)
+          .style("fill", (d) => color(d.key))
+          .style("fill-opacity", 0.8)
+          // .style("opacity", 0.5)
+          .attr("stroke", "black")
+          .style("stroke-width", 1)
+          .on("mouseover", mouseover) // What to do when hovered
+          .on("mousemove", mousemove)
+          .on("mouseleave", mouseleave)
+          .on("click", clickfunction)
+          .call(
+            d3
+              .drag() // call specific function when circle is dragged
+              .on("start", dragstarted)
+              .on("drag", dragged)
+              .on("end", dragended)
+          );
+
+        // Features of the forces applied to the nodes:
+        const simulation = d3
+          .forceSimulation()
+          .force(
+            "center",
+            d3
+              .forceCenter()
+              .x(width / 2)
+              .y(height / 2)
+          ) // Attraction to the center of the svg area
+          .force("charge", d3.forceManyBody().strength(0.3)) // Nodes are attracted one each other of value is > 0
+          .force(
+            "collide",
+            d3
+              .forceCollide()
+              .strength(0.2)
+              .radius(function (d) {
+                return size(d.value) + 3;
+              })
+              .iterations(1)
+          ); // Force that avoids circle overlapping
+
+        // Apply these forces to the nodes and update their positions.
+        // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
+        simulation.nodes(data).on("tick", function (d) {
+          node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+        });
+
+        // What happens when a circle is dragged?
+        function dragstarted(event, d) {
+          if (!event.active) simulation.alphaTarget(0.03).restart();
+          d.fx = d.x;
+          d.fy = d.y;
+        }
+        function dragged(event, d) {
+          d.fx = event.x;
+          d.fy = event.y;
+        }
+        function dragended(event, d) {
+          if (!event.active) simulation.alphaTarget(0.03);
+          d.fx = null;
+          d.fy = null;
+        }
+      });
+    }
+    property = "new_cases";
+    span_id = "#bubble_chart_1";
+    g_title = "Cases Per Country";
+    createBubbleChart(csv_loc, property, span_id, g_title);
+
+    property = "new_deaths";
+    span_id = "#bubble_chart_2";
+    g_title = "Deaths Per Country";
+    createBubbleChart(csv_loc, property, span_id, g_title);
+
+    property = "new_vaccinations";
+    span_id = "#bubble_chart_3";
+    g_title = "New Vaccinations Per Country";
+    createBubbleChart(csv_loc, property, span_id, g_title);
+
+    property = "population_density";
+    span_id = "#bubble_chart_4";
+    g_title = "Population Density Per Country";
+    createBubbleChart(csv_loc, property, span_id, g_title);
+
+    ///////////////////////////Brushed Line Chart //////////////////////////////////////////
+
+    function createLineChart(csv_loc, country, property, span_id, color_name) {
+      //color_name = "lightblue";
+      var format = d3.timeFormat("%Y-%m-%d");
+
+      filterData(csv_loc, country, property).then(function (data) {
+        svg
+          .select(".linechart_title")
+          .text(country + " : " + property + " per month");
+        x1.domain(
+          d3.extent(data, function (d) {
+            return d.date;
+          })
+        );
+        y1.domain([
+          0,
+          d3.max(data, function (d) {
+            return d.value;
+          }),
+        ]);
+
+        x2.domain(
+          d3.extent(data, function (d) {
+            return d.date;
+          })
+        );
+        y2.domain([
+          0,
+          d3.max(data, function (d) {
+            return d.value;
+          }),
+        ]);
+        x_axis_1
+          .call(
+            d3.axisBottom(x1).ticks(20).tickFormat(d3.timeFormat("%Y-%m-%d"))
+          )
+          .selectAll("text")
+          .style("text-anchor", "end")
+          .style("color", "black")
+          .attr("dx", "-.8em")
+          .attr("dy", ".15em")
+          .attr("transform", "rotate(-65)");
+        y_axis_1.transition().duration(1000).call(d3.axisLeft(y1));
+
+        x_axis_2
+          .call(
+            d3.axisBottom(x2).ticks(20).tickFormat(d3.timeFormat("%Y-%m-%d"))
+          )
+          .selectAll("text")
+          .style("text-anchor", "end")
+          .style("color", "black")
+          .attr("dx", "-.8em")
+          .attr("dy", ".15em")
+          .attr("transform", "rotate(-65)");
+        y_axis_2.transition().duration(1000).call(d3.axisLeft(y2));
+
+        // Add a clipPath: everything out of this area won't be drawn.
+        const clip = svg
+          .append("defs")
+          .append("svg:clipPath")
+          .attr("id", "clip")
+          .append("svg:rect")
+          .attr("width", width)
+          .attr("height", height1)
+          .attr("x", 0)
+          .attr("y", xaxis1_height_offset);
+
+        const clip2 = svg
+          .append("defs")
+          .append("svg:clipPath")
+          .attr("id", "clip2")
+          .append("svg:rect")
+          .attr("width", width)
+          .attr("height", height2)
+          .attr("x", 0)
+          .attr("y", height2);
+
+        // Add brushing
+        const brush = d3
+          .brushX() // Add the brush feature using the d3.brush function
+          .extent([
+            [0, xaxis1_height_offset],
+            [width, height1 + xaxis1_height_offset],
+          ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+          .on("end", updateChart); // Each time the brush selection changes, trigger the 'updateChart' function
+
+        // Create the line variable: where both the line and the brush take place
+        const line_1 = svg.append("g").attr("clip-path", "url(#clip)");
+
+        // Add the line
+        line_1
+          .append("path")
+          .datum(data)
+          .attr("class", "line_1") // I add the class line to be able to modify this line later on.
+          .attr("fill", "none")
+          .attr("stroke", color_name)
+          .attr("stroke-width", 1.5)
+          .attr(
+            "d",
+            d3
+              .line()
+              .x(function (d) {
+                return x1(d.date);
+              })
+              .y(function (d) {
+                return y1(d.value) + xaxis1_height_offset;
+              })
+          );
+
+        // Add the brushing
+        line_1.append("g").attr("class", "brush").call(brush);
+
+        //const line_2 = svg.append("g").attr("clip-path", "url(#clip)");
+
+        const line_2 = svg.append("g").attr("clip-path", "url(#clip2)");
+
+        // Add the line
+        line_2
+          .append("path")
+          .datum(data)
+          .attr("class", "line_2") // I add the class line to be able to modify this line later on.
+          .attr("fill", "none")
+          .attr("stroke", "lightblue")
+          .attr("stroke-width", 1.5)
+          .attr(
+            "d",
+            d3
+              .line()
+              .x(function (d) {
+                return x2(d.date);
+              })
+              .y(function (d) {
+                return y2(d.value) + height2;
+              })
+          );
+
+        // Add the brushing
+        //line_2.append("g").attr("class", "brush").call(brush);
+
+        // A function that set idleTimeOut to null
+        let idleTimeout;
+        function idled() {
+          idleTimeout = null;
+        }
+
+        function updateChart(event, d) {
+          // What are the selected boundaries?
+          extent = event.selection;
+
+          // If no selection, back to initial coordinate. Otherwise, update X axis domain
+          if (!extent) {
+            if (!idleTimeout) return (idleTimeout = setTimeout(idled, 350)); // This allows to wait a little bit
+            x.domain([4, 8]);
+          } else {
+            console.log("d", d);
+            console.log("extent", extent);
+            console.log("x2.invert(extent[0])", x2.invert(extent[0]));
+            console.log("x2.invert(extent[1])", x2.invert(extent[1]));
+            console.log("x2.invert(0)", x2.invert(0));
+            console.log("x2.invert(width)", x2.invert(width));
+
+            x2.domain(
+              d3.extent(data, function (d) {
+                return d.date;
+              })
+            );
+            //x.domain([x.invert(0), x.invert(width)]);
+            x2.domain([x2.invert(extent[0]), x2.invert(extent[1])]);
+            line_1.select(".brush").call(brush.move, null); // This remove the grey brush area as soon as the selection has been done
+          }
+
+          // Update axis and line position
+          x_axis_2.transition().duration(1000).call(d3.axisBottom(x2));
+          line_2
+            .select(".line_2")
+            .transition()
+            .duration(1000)
+            .attr(
+              "d",
+              d3
+                .line()
+                .x(function (d) {
+                  return x2(d.date);
+                })
+                .y(function (d) {
+                  return y2(d.value) + height2;
+                })
+            );
+        }
+      });
+    }
+
+    country = "India";
+    property = "new_cases";
+    span_id = "#line_chart_1";
+    color_name = "lightblue";
+    const margin = { top: 30, right: 30, bottom: 70, left: 60 };
+    const width = 1225 - margin.left - margin.right;
+    const height1 = 200 - margin.top - margin.bottom;
+    const height2 = 400 - margin.top - margin.bottom;
+    var xaxis1_height_offset = 50;
+    var xaxis1_height = height1 + xaxis1_height_offset;
+
+    // append the svg object to the body of the page
+    var svg = d3
+      .select(span_id)
+      .append("div")
+      .append("svg")
+      .style("background-color", "white")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height2 * 2 + margin.top * 2 + margin.bottom * 2)
+      .style("border", "solid")
+      .style("border-width", "5px")
+      .style("border-radius", "10px")
+      .style("padding", "5px")
+      .style("border-color", "brown")
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg
+      .append("rect")
+      .attr("width", width)
+      .attr("height", 20)
+      .attr("x", -10)
+      .attr("y", -25)
+      .attr("fill", "brown");
+
+    svg
+      .append("text")
+      .attr("class", "linechart_title")
+      .attr("x", width / 2 - 100)
+      .attr("y", -10)
+      .style("fill", "white")
+      .text(country + " : " + property + " per month");
+
+    svg
+      .append("rect")
+      .attr("width", 300)
+      .attr("height", 20)
+      .attr("x", width / 2 - 140)
+      .attr("y", height1 + 150)
+      .attr("fill", "green");
+
+    svg
+      .append("text")
+      .attr("class", "brush_to_zoom")
+      .attr("x", width / 2 - 50)
+      .attr("y", height1 + 165)
+      .style("fill", "white")
+      .text("Brush To Zoom");
+
+    // X axis & Y axis
+    var x1 = d3.scaleTime().range([0, width]);
+    var y1 = d3.scaleLinear().range([height1, 0]);
+    var x2 = d3.scaleTime().range([0, width]);
+    var y2 = d3.scaleLinear().range([height2, 0]);
+    var x_axis_1 = svg
+      .append("g")
+      .attr("transform", "translate(0," + +xaxis1_height + ")");
+    var y_axis_1 = svg
+      .append("g")
+      .attr("class", "myYaxis")
+      .attr("transform", "translate(0," + +xaxis1_height_offset + ")");
+
+    var x_axis_2 = svg
+      .append("g")
+      .attr("transform", "translate(0," + height2 * 2 + ")");
+    var y_axis_2 = svg
+      .append("g")
+      .attr("class", "myYaxis")
+      .attr("transform", "translate(0," + height2 + ")");
+
+    // A function that create / update the plot for a given variable:
+    //function update(data, color_name) {
+
+    createLineChart(csv_loc, country, property, span_id, color_name);
+
+    ///////////////////////////Map Layout //////////////////////////////////////////
+
+    function createMapLayout(csv_loc, property, element_Id) {
+      const width = 800;
+      const height = 850;
+      const svg = d3
+        .select("#" + element_Id)
+        .append("svg")
+        .style("background-color", "white")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("x", 0)
+        .attr("y", 0);
+
+      //  (width = +svg.attr("width")), (height = +svg.attr("height"));
+
+      const Tooltip = d3
+        .select("#" + element_Id)
+        .append("span")
+        .style("opacity", 0)
+        .attr("class", "tooltip")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "2px")
+        .style("border-radius", "5px")
+        .style("padding", "5px")
+        .style("position", "absolute");
+      svg
+        .style("border", "solid")
+        .style("border-width", "5px")
+        .style("border-radius", "10px")
+        .style("padding", "5px")
+        .style("border-color", "brown");
+
+      svg
+        .append("rect")
+        .attr("width", width)
+        .attr("height", 20)
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("fill", "brown");
+
+      svg
+        .append("text")
+        .attr("class", "map_chart_title")
+        .attr("x", width / 2 - 100)
+        .attr("y", 15)
+        .style("fill", "white")
+        .text("Top Covid Affected Countries");
+
+      svg
+        .append("rect")
+        .attr("width", 400)
+        .attr("height", 20)
+        .attr("x", width / 2 - 200)
+        .attr("y", 25)
+        .attr("fill", "green");
+
+      svg
+        .append("text")
+        .attr("class", "map_evol_action_title")
+        .attr("x", width / 2 - 160)
+        .attr("y", 40)
+        .style("fill", "white")
+        .text("Click on Country to see Evolution Graph Below");
+      // Map and projection
+      const path = d3.geoPath();
+      const projection = d3
+        .geoMercator()
+        .scale(140)
+        .center([0, 20])
+        .translate([width / 2, height / 2]);
+
+      // Data and color scale
+      const data = new Map();
+      var colorScale = d3
+        .scaleLinear()
+        .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
+        .range(["gold", "orange", "red"]);
+
+      fetch_property_stats_by_isocode(csv_loc, property).then(function (d) {
+        console.log("d", d);
+        d.forEach(function (d) {
+          data.set(d.key, d.value);
+        });
+
+        console.log("map", data);
+        // Load external data and boot
+        Promise.all([
+          d3.json(
+            "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"
+          ),
+        ]).then(function (loadData) {
+          let topo = loadData[0];
+          console.log("data", data);
+          let mouseOver = function (d) {
+            d3.selectAll(".Country")
+              .transition()
+              .duration(200)
+              .style("opacity", 0.5)
+              .style("stroke", "transparent");
+
+            Tooltip.style("opacity", 1);
+
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .style("opacity", 1)
+              .style("stroke", "black");
+          };
+
+          const mousemove = function (event, d) {
+            //d.total = data.get(d.id) || 0;
+            Tooltip.html(
+              "<u>" +
+                d.properties.name +
+                " (" +
+                property +
+                ")" +
+                "</u> : <u>" +
+                d.total +
+                "</u>"
+            )
+              .style("left", event.pageX + 10 + "px")
+              //.style("left", 0 + "px")
+              .style("top", event.pageY + 10 + "px");
+          };
+
+          var clickfunction = function (event, d) {
+            console.log("d", d);
+            console.log("event", event);
+            //span_id = "#line_chart_1";
+            //color_name = color(d.key);
+            //d3.select(span_id).selectAll(".line_1").remove();
+            //d3.select(span_id).selectAll(".line_2").remove();
+            //createLineChart(csv_loc, d.key, d.property, span_id, color_name);
+            //location_sel = "India";
+            location_sel = d.properties.name;
+            console.log("location_sel", location_sel);
+
+            //property_list = ['new_cases','total_deaths','people_fully_vaccinated_per_hundred']
+            property_list = [
+              "total_cases",
+              //"total_vaccinations",
+              "total_deaths",
+              "hosp_patients",
+            ];
+
+            csv_loc =
+              "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv";
+
+            createStackedLineChart(csv_loc, property_list, location_sel);
+          };
+          let mouseLeave = function (d) {
+            d3.selectAll(".Country")
+              .transition()
+              .duration(200)
+              .style("opacity", 0.8);
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .style("stroke", "transparent");
+
+            Tooltip.style("opacity", 0);
+          };
+
+          // Draw the map
+          svg
+            .append("g")
+            .selectAll("path")
+            .data(topo.features)
+            .enter()
+            .append("path")
+            // draw each country
+            .attr("d", d3.geoPath().projection(projection))
+            // set the color of each country
+            .attr("fill", function (d) {
+              d.total = data.get(d.id) || 0;
+              console.log("d.id", d.id, " d.total", d.total);
+              return colorScale(d.total);
+            })
+            .attr("fill-opacity", "0.7")
+            .style("stroke", "transparent")
+            .attr("class", function (d) {
+              return "Country";
+            })
+            .style("opacity", 0.8)
+            .on("mouseover", mouseOver)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseLeave)
+            .on("click", clickfunction);
+        });
+      });
+    }
+    csv_loc =
+      "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv";
+    property = "new_cases";
+    element_Id = "map_chart_1";
+    createMapLayout(csv_loc, property, element_Id);
+
+    ///////////////////////////Stacked Line //////////////////////////////////////////
+
+    function createStackedLineChart(csv_loc, property_list, location_sel) {
+      dataFilterMultiPropertyStackedChart(
+        csv_loc,
+        property_list,
+        location_sel
+      ).then(function (data) {
+        //d3.csv(
+        //  "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered_wide.csv"
+        //).then(function (data) {
+        //////////
+        // GENERAL //
+        //////////
+
+        svgStack
+          .select(".stack_chart_title")
+          .text(location_sel + " Cases and Deaths Trend");
+        x.domain(
+          d3.extent(data, function (d) {
+            return d.date;
+          })
+        );
+
+        xAxis.call(d3.axisBottom(x).ticks(5));
+
+        var max = 0;
+        property_list.forEach(function (property, i) {
+          var max_y = d3.max(data, function (d) {
+            return d[property];
+          });
+          console.log("max prop: ", property, " ", max_y);
+          if (max < max_y) {
+            max = max_y;
+          }
+        });
+
+        console.log("max y", max);
+
+        y.domain([0, +max]);
+        yAxis.call(d3.axisLeft(y).ticks(5));
+
+        // List of groups = header of the csv files
+        const keys = property_list;
+
+        // color palette
+        const color = d3.scaleOrdinal().domain(keys).range(d3.schemeSet2);
+
+        //stack the data?
+        const stackedData = d3.stack().keys(keys)(data);
+        console.log("stackedData", stackedData);
+
+        //////////
+        // AXIS //
+        //////////
+
+        //////////
+        // BRUSHING AND CHART //
+        //////////
+
+        // Add a clipPath: everything out of this area won't be drawn.
+        const clipStack = svgStack
+          .append("defs")
+          .append("svg:clipPath")
+          .attr("id", "clipStack")
+          .append("svg:rect")
+          .attr("width", widthStack)
+          .attr("height", height + 5)
+          .attr("x", 0)
+          .attr("y", -5);
+
+        // Add brushing
+        const brush = d3
+          .brushX() // Add the brush feature using the d3.brush function
+          .extent([
+            [0, -5],
+            [widthStack, height + 5],
+          ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+          .on("end", updateChart); // Each time the brush selection changes, trigger the 'updateChart' function
+
+        // Create the scatter variable: where both the circles and the brush take place
+        const areaChart = svgStack
+          .append("g")
+          .attr("clip-path", "url(#clipStack)");
+
+        // Area generator
+        const area = d3
+          .area()
+          .x(function (d) {
+            //console.log("date", d.data.date);
+            return x(d.data.date);
+          })
+          .y0(function (d) {
+            //console.log("d[0]", d[0]);
+            return y(d[0]);
+          })
+          .y1(function (d) {
+            //console.log("d[1]", d[1]);
+            return y(d[1]);
+          });
+
+        svgStack.selectAll(".myArea").remove();
+
+        // Show the areasremove
+        areaChart
+          .selectAll("mylayers")
+          .data(stackedData)
+          .join("path")
+          .attr("class", function (d) {
+            return "myArea " + d.key;
+          })
+          .style("fill", function (d) {
+            return color(d.key);
+          })
+          .attr("d", area);
+
+        // Add the brushing
+        areaChart.append("g").attr("class", "brush").call(brush);
+
+        let idleTimeout;
+        function idled() {
+          idleTimeout = null;
+        }
+
+        // A function that update the chart for given boundaries
+        function updateChart(event, d) {
+          extent = event.selection;
+
+          // If no selection, back to initial coordinate. Otherwise, update X axis domain
+          if (!extent) {
+            if (!idleTimeout) return (idleTimeout = setTimeout(idled, 350)); // This allows to wait a little bit
+            x.domain(
+              d3.extent(data, function (d) {
+                return d.date;
+              })
+            );
+          } else {
+            x.domain([x.invert(extent[0]), x.invert(extent[1])]);
+            areaChart.select(".brush").call(brush.move, null); // This remove the grey brush area as soon as the selection has been done
+          }
+
+          // Update axis and area position
+          xAxis.transition().duration(1000).call(d3.axisBottom(x).ticks(5));
+          areaChart
+            .selectAll("path")
+            .transition()
+            .duration(1000)
+            .attr("d", area);
+        }
+
+        //////////
+        // HIGHLIGHT GROUP //
+        //////////
+
+        // What to do when one group is hovered
+        const highlight = function (event, d) {
+          // reduce opacity of all groups
+          d3.selectAll(".myArea").style("opacity", 0.1);
+          // expect the one that is hovered
+          d3.select("." + d).style("opacity", 1);
+        };
+
+        // And when it is not hovered anymore
+        const noHighlight = function (event, d) {
+          d3.selectAll(".myArea").style("opacity", 1);
+        };
+
+        //////////
+        // LEGEND //
+        //////////
+
+        // Add one dot in the legend for each name.
+        const size = 20;
+        svgStack
+          .selectAll("myrect")
+          .data(keys)
+          .join("rect")
+          .attr("x", 0)
+          .attr("y", function (d, i) {
+            return height + 40 + i * (size + 5);
+          }) // 100 is where the first dot appears. 25 is the distance between dots
+          .attr("width", size)
+          .attr("height", size)
+          .style("fill", function (d) {
+            return color(d);
+          })
+          .on("mouseover", highlight)
+          .on("mouseleave", noHighlight);
+
+        // Add one dot in the legend for each name.
+        svgStack
+          .selectAll("mylabels")
+          .data(keys)
+          .join("text")
+          .attr("x", 0 + size * 1.2)
+          .attr("y", function (d, i) {
+            return height + 40 + i * (size + 5) + size / 2;
+          }) // 100 is where the first dot appears. 25 is the distance between dots
+          .style("fill", function (d) {
+            return color(d);
+          })
+          .text(function (d) {
+            return d;
+          })
+          .attr("text-anchor", "left")
+          .style("alignment-baseline", "middle")
+          .on("mouseover", highlight)
+          .on("mouseleave", noHighlight);
+      });
+    }
+
+    // Initialize the plot with the first dataset
+    location_sel = "India";
+    //property_list = ['new_cases','total_deaths','people_fully_vaccinated_per_hundred']
+    property_list = [
+      "total_cases",
+      //"total_vaccinations",
+      "total_deaths",
+      "hosp_patients",
+    ];
+
+    csv_loc =
+      "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv";
+
+    const marginSTack = { top: 60, right: 230, bottom: 50, left: 100 },
+      widthStack = 1350 - marginSTack.left - marginSTack.right,
+      height = 300 - marginSTack.top - marginSTack.bottom;
+
+    // Add X axis
+
+    // append the svg object to the body of the page
+    const svgStack = d3
+      .select("#stack_chart_1")
+      .append("svg")
+      .style("background-color", "white")
+      .attr("width", widthStack + marginSTack.right)
+      .attr("height", height * 2 - 100 + marginSTack.top + marginSTack.bottom)
+      .style("border", "solid")
+      .style("border-width", "5px")
+      .style("border-radius", "10px")
+      .style("padding", "5px")
+      .style("border-color", "brown")
+      .append("g")
+      .attr("transform", `translate(${marginSTack.left}, ${marginSTack.top})`);
+
+    const x = d3.scaleTime().range([0, widthStack]);
+    const y = d3.scaleLinear().range([height, 0]);
+    const xAxis = svgStack
+      .append("g")
+      .attr("transform", `translate(0, ${height})`);
+    const yAxis = svgStack.append("g");
+
+    // Add X axis label:
+    svgStack
+      .append("text")
+      .attr("text-anchor", "end")
+      .attr("x", widthStack)
+      .attr("y", height + 40)
+      .text("Time (year)");
+
+    // Add Y axis label:
+
+    svgStack
+      .append("rect")
+      .attr("width", width - 100)
+      .attr("height", 20)
+      .attr("x", 0)
+      .attr("y", -60)
+      .attr("fill", "brown");
+
+    svgStack
+      .append("text")
+      .attr("class", "stack_chart_title")
+      .attr("x", width / 2 - 100)
+      .attr("y", -45)
+      .style("fill", "white")
+      .text(location_sel + " Cases and Deaths Trend");
+
+    svgStack
+      .append("rect")
+      .attr("width", 300)
+      .attr("height", 20)
+      .attr("x", width / 2 - 160)
+      .attr("y", -35)
+      .attr("fill", "green");
+
+    svgStack
+      .append("text")
+      .attr("class", "brush_to_zoom_stack")
+      .attr("x", width / 2 - 55)
+      .attr("y", -20)
+      .style("fill", "white")
+      .text("Brush To Zoom");
+
+    createStackedLineChart(csv_loc, property_list, location_sel);
+  </script>
+</html>

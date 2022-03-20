@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="./dataFiltering.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body id="svgShowcase">
+    <div> <br></div>
+    <div id = 'graph1_text'> Data Grping</div>
+    <div id = 'graph1'> </div>
+
+    </body>
+
+    <script>
+    //Call Func
+
+    csv_loc =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv";
+      
+        location_sel = 'India'
+        property_list = ['new_cases','new_deaths','people_fully_vaccinated_per_hundred']
+
+        dataFilterMultiPropertyChart(csv_loc,property_list,location_sel)
+
+
+    </script>
+    <!--BODY_CHECKPOINT-->
+  </body>
+</html>

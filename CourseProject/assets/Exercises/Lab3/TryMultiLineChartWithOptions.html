@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    /* set the CSS */
+
+    body {
+      font: 12px Arial;
+    }
+
+    path {
+      stroke: steelblue;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .axis path,
+    .axis line,
+    .axis line {
+      fill: none;
+      stroke: grey;
+      stroke-width: 1;
+    }
+
+    .legend {
+      font-size: 16px;
+      font-weight: bold;
+      text-anchor: middle;
+    }
+  </style>
+
+  <body id="svgShowcase">
+    <div id = 'multiple_select'> Choose Country (Multiple Selection Possible) <br> <br></div>
+    <div>
+      <select
+        width="300"
+        style="width: 350px"
+        size="8"
+        multiple
+        id="menu"
+      ></select>
+      <br>
+    </div>
+    <div> <br></div>
+    <div id = 'graph1_text'> Total Number of Cases Per Month</div>
+    <div id = 'graph1'> </div>
+
+    </body>
+    <!--BODY_CHECKPOINT-->
+
+    <!--<button onclick="update(data1,'red')">Variable 1</button>   -->
+    <!--<button onclick="update(data2,'blue')">Variable 2</button>-->
+    <!--<button onclick="update(data3,'green')">Variable 3</button>-->
+    <br /><br /><br />
+    <script>
+      csv_loc =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv";
+      var margin = { top: 30, right: 20, bottom: 70, left: 50 },
+        width = 1200 - margin.left - margin.right,
+        height = 300 - margin.top - margin.bottom;
+
+      // Parse the date / time
+
+      //var parseDate = d3.time.format("%b %Y");
+      const parseTime = d3.timeParse("%Y-%m-%d");
+
+      // Set the ranges
+      //var x = d3.time.scale().range([0, width]);
+      //var y = d3.scale.linear().range([height, 0]);
+      var x = d3.scaleTime().range([0, width]);
+      var y = d3.scaleLinear().range([height, 0]);
+
+      // Adds the svg canvas
+      var svg = d3
+        .select("body")
+        .select("#graph1")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var xAxis = svg
+        .append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")");
+
+      var yAxis = svg.append("g").attr("class", "y axis");
+
+      var menu = d3.selectAll("#menu");
+      // Define the line
+
+      // A function that create / update the plot for a given variable:
+      function update_1(data_loc, country_list) {
+        var priceline = d3
+          .line()
+          .x(function (d) {
+            return x(d.date);
+          })
+          .y(function (d) {
+            return y(d.new_cases);
+          });
+
+        d3.csv(data_loc).then(function (data) {
+          data.forEach(function (d) {
+            //d.date = parseDate.parse(d.date);
+            d.date = parseTime(d.date);
+            d.new_cases = +d.new_cases;
+            //console.log("record:", d);
+          });
+
+          // Scale the range of the data
+
+          // Nest the entries by symbol
+          var dataNest = d3.group(data, (d) => d.location);
+          var color = d3.scaleOrdinal(d3.schemePaired);
+          //var color = d3.scale.category10(); // set the colour scale
+
+          menu
+            .selectAll("option")
+            //.remove()
+            .data(dataNest.keys())
+            .enter()
+            .append("option")
+            .attr("value", function (d) {
+              return d;
+            })
+            .text(function (d) {
+              return d;
+            });
+
+          legendSpace = width / dataNest.size; // spacing for legend
+          console.log("legendSpace", legendSpace);
+          //console.log("dataNest", dataNest);
+          console.log("dataNest.keys().length", dataNest.size);
+          // Loop through each symbol / key
+          counter = -1;
+          svg.selectAll(".line").remove();
+
+          var filtered = data.filter(function (d) {
+            // return d.location == country_list;
+            return country_list.indexOf(d.location) !== -1;
+          });
+
+          var dataNest_mod = d3.group(filtered, (d) => d.location);
+          console.log("Filtered dataNest.size", dataNest_mod.size);
+
+          x.domain(
+            d3.extent(filtered, function (d) {
+              return d.date;
+            })
+          );
+          y.domain([
+            0,
+            d3.max(filtered, function (d) {
+              return d.new_cases;
+            }),
+          ]);
+
+          dataNest_mod.forEach(function (d, i) {
+            counter += 1;
+            console.log("DATANEST record:", d);
+            svg
+              .append("path")
+              .attr("class", "line")
+              .transition()
+              .duration(1000)
+              .style("stroke", function () {
+                // Add the colours dynamically
+                //return "red";
+                return (d.color = color(d));
+              })
+              .attr("d", priceline(d));
+          });
+
+          xAxis
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .style("color", "black")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
+          yAxis.transition().duration(1000).call(d3.axisLeft(y));
+        });
+      }
+
+      menu.on("change", function (event) {
+        checklist = d3
+          .select(this)
+          .selectAll("option")
+          .filter(function (d, i) {
+            return this.selected;
+          });
+        final_list = checklist["_groups"][0];
+
+        options = [];
+        final_list.forEach(function (d) {
+          options.push(d["__data__"]);
+        });
+
+        console.log(options);
+        update_1(csv_loc, options);
+      });
+
+      // Initialize the plot with the first dataset
+      country_list = ["Congo", "United States"];
+      update_1(csv_loc, country_list);
+
+
+
+
+    </script>
+    <!--BODY_CHECKPOINT-->
+  </body>
+</html>
