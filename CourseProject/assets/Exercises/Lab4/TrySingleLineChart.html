@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="./dataFiltering.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body id="svgShowcase">
+    <!--BODY_CHECKPOINT-->
+    <script>
+      // heading
+      // set the dimensions and margins of the graph
+      function createLineChart(csv_loc, country, property) {
+        const margin = { top: 30, right: 30, bottom: 70, left: 60 };
+        const width = 1400 - margin.left - margin.right;
+        const height = 400 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3
+          .select("body")
+          .append("div")
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .style("border", "solid")
+          .style("border-width", "5px")
+          .style("border-radius", "10px")
+          .style("padding", "5px")
+          .style("border-color", "brown")
+          .append("g")
+          .attr(
+            "transform",
+            "translate(" + margin.left + "," + margin.top + ")"
+          );
+
+        svg
+          .append("rect")
+          .attr("width", 580)
+          .attr("height", 20)
+          .attr("x", 10)
+          .attr("y", -25)
+          .attr("fill", "brown");
+
+        // X axis
+        var x = d3.scaleTime().range([0, width]);
+        var x_axis = svg
+          .append("g")
+          .attr("transform", "translate(0," + height + ")");
+        // Add Y axis
+        var y = d3.scaleLinear().range([height, 0]);
+        var y_axis = svg.append("g").attr("class", "myYaxis");
+
+        // A function that create / update the plot for a given variable:
+        //function update(data, color_name) {
+
+        color_name = "red";
+        var format = d3.timeFormat("%Y-%m-%d");
+
+        filterData(csv_loc, country, property).then(function (data) {
+          svg
+            .append("text")
+            .attr("x", 200)
+            .attr("y", -10)
+            .style("fill", "white")
+            .text(country + " : " + property + " per day");
+
+          x.domain(
+            d3.extent(data, function (d) {
+              return d.date;
+            })
+          );
+          //x.domain(
+          //  data.map(function (d) {
+          //    return d.date;
+          //  })
+          //);
+          y.domain([
+            0,
+            d3.max(data, function (d) {
+              return d.value;
+            }),
+          ]);
+          x_axis
+            .call(
+              d3.axisBottom(x).ticks(20).tickFormat(d3.timeFormat("%Y-%m-%d"))
+              //.tickValues(
+              //  data.map(function (d) {
+              //    return new Date(d.date);
+              //  })
+              //)
+            )
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .style("color", "black")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
+          y_axis.transition().duration(1000).call(d3.axisLeft(y));
+
+          var u = svg.selectAll(".line").data([data], (d) => {
+            return d.date;
+          });
+
+          u.enter()
+            .append("path")
+            .attr("class", "line")
+            .merge(u)
+            .transition()
+            .duration(1000)
+            .attr(
+              "d",
+              d3
+                .line()
+                .x(function (d) {
+                  return x(d.date);
+                })
+                .y(function (d) {
+                  return y(d.value);
+                })
+            )
+            .attr("fill", "none")
+            .attr("stroke", color_name)
+            .attr("stroke-width", 3);
+        });
+      }
+      csv_loc =
+        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv";
+      country = "India";
+      property = "new_cases";
+      createLineChart(csv_loc, country, property);
+      // Initialize the plot with the first dataset
+    </script>
+    <!--BODY_CHECKPOINT-->
+  </body>
+</html>

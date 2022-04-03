@@ -115,7 +115,7 @@
 
     function createBubbleChart(csv_loc, property, span_id, g_title) {
       const width = 600;
-      const height = 460;
+      const height = 480;
 
       // append the svg object to the body of the page
 
@@ -197,9 +197,9 @@
           Tooltip.html(
             "<u>" + d.property + " - " + d.key + "</u>" + " : " + d.value
           )
-            .style("left", event.pageX + 10 + "px")
+            .style("left", event.pageX - 50 + "px")
             //.style("left", 0 + "px")
-            .style("top", event.pageY + 10 + "px");
+            .style("top", event.pageY - 200 + "px");
         };
         var mouseleave = function (event, d) {
           Tooltip.style("opacity", 0);
@@ -313,9 +313,9 @@
     g_title = "New Vaccinations Per Country";
     createBubbleChart(csv_loc, property, span_id, g_title);
 
-    property = "population_density";
+    property = "gdp_per_capita";
     span_id = "#bubble_chart_4";
-    g_title = "Population Density Per Country";
+    g_title = "GDP Per Capita Per Country";
     createBubbleChart(csv_loc, property, span_id, g_title);
 
     ///////////////////////////Brushed Line Chart //////////////////////////////////////////
@@ -327,7 +327,7 @@
       filterData(csv_loc, country, property).then(function (data) {
         svg
           .select(".linechart_title")
-          .text(country + " : " + property + " per month");
+          .text(country + " : " + property + " per day");
         x1.domain(
           d3.extent(data, function (d) {
             return d.date;
@@ -552,7 +552,7 @@
       .attr("x", width / 2 - 100)
       .attr("y", -10)
       .style("fill", "white")
-      .text(country + " : " + property + " per month");
+      .text(country + " : " + property + " per day");
 
     svg
       .append("rect")
@@ -719,9 +719,9 @@
                 d.total +
                 "</u>"
             )
-              .style("left", event.pageX + 10 + "px")
+              .style("left", event.pageX - 50 + "px")
               //.style("left", 0 + "px")
-              .style("top", event.pageY + 10 + "px");
+              .style("top", event.pageY - 200 + "px");
           };
 
           var clickfunction = function (event, d) {
