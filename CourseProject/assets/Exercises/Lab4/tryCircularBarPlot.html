@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v7.js"></script>
+<script src="./dataFunctions_lab4.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+<script>
+  function createAreaPointsChart(
+    property,
+    year,
+    span_id,
+    location_x,
+    location_y,
+    svg,
+    Tooltip,
+    width,
+    height,
+    margin,
+    innerRadius,
+    outerRadius,
+    chartStats,
+    controlButtons,
+    chartHeader,
+    data_order
+  ) {
+    Tooltip.style("opacity", 0)
+      .attr("class", "tooltip")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("padding", "5px")
+      .style("position", "absolute");
+
+    total_width = width + margin.left + margin.right;
+    total_height = height + margin.top + margin.bottom;
+
+    controlButton_wd = total_width / 3 - 50;
+    controlButton_ht = 20;
+
+    var button_ph_1 = controlButtons
+      .append("rect")
+      .attr("width", controlButton_wd)
+      .attr("height", controlButton_ht)
+      .attr("x", -1 * controlButton_wd - 10)
+      .attr("y", (-1 * total_height) / 2 + 10)
+      .attr("fill", "#69b3a2");
+
+    var button_text_1 = controlButtons
+      .append("text")
+      .attr("class", "buttons")
+      .attr("text-anchor", "middle")
+      .attr("x", (-1 * controlButton_wd) / 2 - 10)
+      .attr("y", (-1 * total_height) / 2 + 25)
+      .style("fill", "white")
+      .text("Highest")
+      .on("click", function (event, d) {
+        console.log("Clicked Circle", d);
+        createAreaPointsChart(
+          property,
+          year,
+          span_id,
+          location_x,
+          location_y,
+          svg,
+          Tooltip,
+          width,
+          height,
+          margin,
+          innerRadius,
+          outerRadius,
+          chartStats,
+          controlButtons,
+          chartHeader,
+          "DESC"
+        );
+      });
+
+    var button_ph_2 = controlButtons
+      .append("rect")
+      .attr("width", controlButton_wd)
+      .attr("height", controlButton_ht)
+      .attr("x", 10)
+      .attr("y", (-1 * total_height) / 2 + 10)
+      .attr("fill", "#69b3a2");
+
+    var button_text_2 = controlButtons
+      .append("text")
+      .attr("class", "buttons")
+      .attr("text-anchor", "middle")
+      .attr("x", (1 * controlButton_wd) / 2 + 10)
+      .attr("y", (-1 * total_height) / 2 + 25)
+      .style("fill", "white")
+      .text("Lowest")
+      .on("click", function (event, d) {
+        console.log("Clicked Circle", d);
+        createAreaPointsChart(
+          property,
+          year,
+          span_id,
+          location_x,
+          location_y,
+          svg,
+          Tooltip,
+          width,
+          height,
+          margin,
+          innerRadius,
+          outerRadius,
+          chartStats,
+          controlButtons,
+          chartHeader,
+          "ASC"
+        );
+      });
+
+    chartHeadrer_wd = total_width - 50;
+    chartHeadrer_ht = "20";
+    var headerBox = chartHeader
+      .append("rect")
+      .attr("width", chartHeadrer_wd)
+      .attr("height", chartHeadrer_ht)
+      .attr("x", (-1 * chartHeadrer_wd) / 2)
+      .attr("y", (-1 * total_height) / 2 - 20)
+      .attr("fill", "#69b3a2");
+
+    if (data_order == "DESC") {
+      title_key = "Top";
+    } else {
+      title_key = "Bottom";
+    }
+
+    console.log("data_order", data_order);
+    console.log("title_key", title_key);
+
+    var headerText = chartHeader
+      .append("text")
+      .attr("class", "buttons")
+      .attr("text-anchor", "middle")
+      .attr("x", 0)
+      .attr("y", (-1 * total_height) / 2 - 5)
+      .style("fill", "white")
+      .text(title_key + " 50 Countries by " + property);
+
+    combinedPropertyStatsPerYear(year).then(function (data) {
+      data = data.filter(function (d) {
+        return d[property] != 0;
+      });
+
+      if (data_order === "ASC") {
+        data.sort(function (b, a) {
+          return b[property] - a[property];
+        });
+      } else {
+        data.sort(function (b, a) {
+          return a[property] - b[property];
+        });
+      }
+
+      var property_data_full = data.map(function (d) {
+        return d[property];
+      });
+
+      data = data.slice(0, 50);
+
+      //Find highest property Country
+      highest = data.slice(0, 1)[0];
+      console.log("highest", highest);
+
+      chartStats.selectAll("text").remove();
+
+      if (data_order === "DESC") {
+        chartStats_key = "Highest";
+      } else {
+        chartStats_key = "Lowest";
+      }
+      chartStats
+        .style("opacity", 0)
+        .append("text")
+        .style("fill", "#69b3a2")
+        .text(chartStats_key + " " + property)
+        .attr("text-anchor", "middle")
+        .attr("x", 0)
+        .attr("y", -20)
+        .style("font-size", "14px")
+        .style("stroke", "#69b3a2")
+        .style("stroke-width", "0.5");
+
+      chartStats
+        .style("opacity", 0)
+        .append("text")
+        .style("fill", "#69b3a2")
+        .text("Country: ")
+        .attr("text-anchor", "middle")
+        .attr("x", 0)
+        .attr("y", 0)
+        .style("font-size", "14px")
+        .style("stroke", "#69b3a2")
+        .style("stroke-width", "0.5");
+
+      chartStats
+        .style("opacity", 0)
+        .append("text")
+        .style("fill", "#69b3a2")
+        .text(highest.country_name + " (" + highest[property] + ")")
+        .attr("text-anchor", "middle")
+        .attr("x", 0)
+        .attr("y", +20)
+        .style("font-size", "16px")
+        .style("stroke", "#69b3a2")
+        .style("stroke-width", "0.5");
+
+      data = d3.shuffle(data);
+
+      console.log("Sorted Sliced Data:", data);
+
+      var property_data = data.map(function (d) {
+        return d[property];
+      });
+
+      var colorScale = d3
+        .scaleLinear()
+        .range(["#69b3a2", "#90EE90"])
+        .domain([d3.min(property_data), d3.max(property_data)]);
+
+      // Scales
+      const x = d3
+        .scaleBand()
+        .range([0, 2 * Math.PI]) // X axis goes from 0 to 2pi = all around the circle. If I stop at 1Pi, it will be around a half circle
+        .align(0) // This does nothing
+        .domain(data.map((d) => d.country_name)); // The domain of the X axis is the list of states.
+      const y = d3
+        .scaleRadial()
+        .range([innerRadius, outerRadius]) // Domain will be define later.
+        .domain([0, d3.max(property_data)]); // Domain of Y is from 0 to the max seen in the data
+
+      const mouseover = function (event, d) {
+        d3.selectAll("path")
+          .transition()
+          .duration(200)
+          .style("opacity", 0.5)
+          .style("stroke", "transparent");
+
+        Tooltip.style("opacity", 1);
+
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .style("opacity", 1)
+          .style("stroke", "black");
+      };
+      const mousemove = function (event, d) {
+        Tooltip.html(
+          "<u>" +
+            d.country_name +
+            " (" +
+            property +
+            ")" +
+            "</u> : <u>" +
+            +parseFloat(d[property].toFixed(2)) +
+            "</u>"
+        )
+          .style("left", event.pageX + 10 + "px")
+          //.style("left", 0 + "px")
+          .style("top", event.pageY + 10 + "px");
+      };
+      var mouseleave = function (event, d) {
+        d3.selectAll("path")
+          .transition()
+          .duration(200)
+          .style("opacity", 0.8)
+          .style("stroke", "transparent");
+        d3.select(this).transition().duration(200);
+
+        Tooltip.style("opacity", 0);
+      };
+      var clickfunction = function (event, d) {
+        console.log("Clicked path", d);
+        //d3.select(span_id).selectAll(".line_1").remove();
+        //d3.select(span_id).selectAll(".line_2").remove();
+        //createLineChart(csv_loc, d.key, d.property, span_id, color_name);
+      };
+
+      // Add the bars
+      svg.selectAll(".cirBars").remove();
+      svg
+        .append("g")
+        .selectAll("path")
+        .data(data)
+        .join("path")
+        .attr("class", "cirBars")
+        .attr("fill", function (d) {
+          return colorScale(d[property]);
+        })
+        .on("mouseover", mouseover) // What to do when hovered
+        .on("mousemove", mousemove)
+        .on("mouseleave", mouseleave)
+        .on("click", clickfunction)
+        .attr(
+          "d",
+          d3
+            .arc() // imagine your doing a part of a donut plot
+            .innerRadius(innerRadius)
+            .outerRadius(0)
+            .startAngle((d) => x(d.country_name))
+            .endAngle((d) => x(d.country_name) + x.bandwidth())
+            .padAngle(0.01)
+            .padRadius(innerRadius)
+        )
+        .attr("opacity", "0")
+        .transition()
+        .duration(3000)
+        .attr(
+          "d",
+          d3
+            .arc() // imagine your doing a part of a donut plot
+            .innerRadius(innerRadius)
+            .outerRadius((d) => y(d[property]))
+            .startAngle((d) => x(d.country_name))
+            .endAngle((d) => x(d.country_name) + x.bandwidth())
+            .padAngle(0.01)
+            .padRadius(innerRadius)
+        )
+        .attr("opacity", "1");
+
+      // Add the labels
+      svg.selectAll(".cirLabels").remove();
+      svg
+        .append("g")
+        .selectAll("g")
+        .data(data)
+        .join("g")
+        .attr("class", "cirLabels")
+        .attr("text-anchor", function (d) {
+          return (x(d.country_name) + x.bandwidth() / 2 + Math.PI) %
+            (2 * Math.PI) <
+            Math.PI
+            ? "end"
+            : "start";
+        })
+        .attr("transform", function (d) {
+          return (
+            "rotate(" +
+            (((x(d.country_name) + x.bandwidth() / 2) * 180) / Math.PI - 90) +
+            ")" +
+            "translate(" +
+            (y(d[property]) + 10) +
+            ",0)"
+          );
+        })
+        .append("text")
+        .text(function (d) {
+          return d.country_name;
+        })
+        .attr("transform", function (d) {
+          return (x(d.country_name) + x.bandwidth() / 2 + Math.PI) %
+            (2 * Math.PI) <
+            Math.PI
+            ? "rotate(180)"
+            : "rotate(0)";
+        })
+        .style("font-size", "11px")
+        .attr("alignment-baseline", "middle")
+        .attr("opacity", "0")
+        .transition()
+        .duration(5000)
+        .attr("opacity", "1");
+
+      chartStats.transition().duration(3000).style("opacity", 1);
+    });
+  }
+
+  // set the dimensions and margins of the graph
+  const margin = { top: 160, right: 90, bottom: 60, left: 90 },
+    width = 550 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom,
+    innerRadius = 90,
+    outerRadius = Math.min(width, height) / 2; // the outerRadius goes from the middle of the SVG area to the border
+
+  year = "2013";
+  property = "population";
+  span_id = "my_dataviz";
+  location_x = "0";
+  location_y = "0";
+  // append the svg object
+  const svg = d3
+    .select("#" + span_id)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("position", "relative")
+    .style("top", location_y)
+    .style("left", location_x)
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${width / 2 + margin.left}, ${height / 2 + margin.top})`
+    );
+
+  var controlButtons = svg.append("g").attr("class", "controlButtons");
+
+  const Tooltip = d3.select("#" + span_id).append("span");
+
+  var chartStats = svg.append("g").attr("class", "chartStats");
+  var chartHeader = svg.append("g").attr("class", "chartHeader");
+  var data_order = "ASC";
+
+  createAreaPointsChart(
+    property,
+    year,
+    span_id,
+    location_x,
+    location_y,
+    svg,
+    Tooltip,
+    width,
+    height,
+    margin,
+    innerRadius,
+    outerRadius,
+    chartStats,
+    controlButtons,
+    chartHeader,
+    data_order
+  );
+</script>

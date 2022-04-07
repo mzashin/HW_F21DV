@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="./dataFunctions_lab4.js"></script>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -48,8 +49,7 @@
       <br>
     </div>
     <div> <br></div>
-    <div id = 'graph1_text'> Total Number of Cases Per Month</div>
-    <div id = 'graph1'> </div>
+    <div id = 'graph1_text'> </div>
 
     </body>
     <!--BODY_CHECKPOINT-->
@@ -59,66 +59,73 @@
     <!--<button onclick="update(data3,'green')">Variable 3</button>-->
     <br /><br /><br />
     <script>
-      csv_loc =
-        "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab3/dataset/owid-covid-data.csv";
-      var margin = { top: 30, right: 20, bottom: 70, left: 50 },
-        width = 1200 - margin.left - margin.right,
-        height = 300 - margin.top - margin.bottom;
+      
+      function createMultiLineChart (
+    property,
+    span_id,
+    location_x,
+    location_y,
+    svg,
+    width,
+    height,
+    margin,
+    xAxis,
+    yAxis,
+    chartHeader,
+    chartStats,
+    menu_span_id){
 
-      // Parse the date / time
 
-      //var parseDate = d3.time.format("%b %Y");
-      const parseTime = d3.timeParse("%Y-%m-%d");
+    total_width = width + margin.left + margin.right;
+    total_height = height + margin.top + margin.bottom;
+      
+    chartHeadrer_wd = total_width - 30;
+    chartHeadrer_ht = "20";
 
-      // Set the ranges
-      //var x = d3.time.scale().range([0, width]);
-      //var y = d3.scale.linear().range([height, 0]);
-      var x = d3.scaleTime().range([0, width]);
-      var y = d3.scaleLinear().range([height, 0]);
+    var headerBox = chartHeader
+      .append("rect")
+      .attr("width", chartHeadrer_wd)
+      .attr("height", chartHeadrer_ht)
+      .attr("x", -1 * margin.left + (total_width - chartHeadrer_wd) / 2)
+      .attr("y", -1 * margin.top + 5)
+      .attr("fill", "#69b3a2");
 
-      // Adds the svg canvas
-      var svg = d3
-        .select("body")
-        .select("#graph1")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var headerText = chartHeader
+      .append("text")
+      .attr("class", "buttons")
+      .attr("text-anchor", "middle")
+      .attr(
+        "x",
+        -1 * margin.left +
+          (total_width - chartHeadrer_wd) / 2 +
+          chartHeadrer_wd / 2
+      )
+      .attr("y", -1 * margin.top + 20)
+      .style("fill", "white")
+      .text("Comparison of "+ property + ' between multiple countries');
 
-      var xAxis = svg
-        .append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")");
 
-      var yAxis = svg.append("g").attr("class", "y axis");
-
-      var menu = d3.selectAll("#menu");
+      var menu = d3.selectAll("#"+ menu_span_id);
       // Define the line
 
       // A function that create / update the plot for a given variable:
-      function update_1(data_loc, country_list) {
-        var priceline = d3
-          .line()
-          .x(function (d) {
-            return x(d.date);
-          })
-          .y(function (d) {
-            return y(d.new_cases);
-          });
+      function update_1( country_list) {
+        
+      var x = d3.scaleTime().range([0, width]);
+      var y = d3.scaleLinear().range([height, 0]);
 
-        d3.csv(data_loc).then(function (data) {
-          data.forEach(function (d) {
-            //d.date = parseDate.parse(d.date);
-            d.date = parseTime(d.date);
-            d.new_cases = +d.new_cases;
-            //console.log("record:", d);
-          });
+        svg.selectAll(".multiLineLabels").remove()
+        
 
+          propertyStatsForAllYearsForAllCountries(property).then(function (data) {
           // Scale the range of the data
 
+          data.forEach(function (d) {
+            d.property_year = parseTime(d.property_year);
+          });
+
           // Nest the entries by symbol
-          var dataNest = d3.group(data, (d) => d.location);
+          var dataNest = d3.group(data, (d) => d.country_name);
           var color = d3.scaleOrdinal(d3.schemePaired);
           //var color = d3.scale.category10(); // set the colour scale
 
@@ -144,50 +151,153 @@
           svg.selectAll(".line").remove();
 
           var filtered = data.filter(function (d) {
-            // return d.location == country_list;
-            return country_list.indexOf(d.location) !== -1;
+            // return d.country_name == country_list;
+            return country_list.indexOf(d.country_name) !== -1;
           });
 
-          var dataNest_mod = d3.group(filtered, (d) => d.location);
+          var stats_data = data.filter(function (d) {
+            return country_list.indexOf(d.country_name) !== -1;
+          });
+       //Find highest & lowest population country
+       stats_data.sort(function (b, a) {
+         return b.property_value - a.property_value;
+       });
+       lowest = stats_data.slice(0, 1)[0];
+
+       stats_data.sort(function (b, a) {
+         return a.property_value - b.property_value;
+       });
+       highest = stats_data.slice(0, 1)[0];
+
+          //Find highest property Country
+
+
+        chartStats.selectAll("text").remove();
+
+        chartStats
+          .style("opacity", 0)
+          .append("text")
+          .style("fill", "#69b3a2")
+          .text("Selected Countries :   " + country_list + " | Highest "+ property+ " Country: "+ highest.country_name+ " (" +highest.property_value + ") | Lowest "+ property+ " Country: "+ lowest.country_name+ " (" +lowest.property_value + ")" )
+          .attr("text-anchor", "left")
+          .attr("x", -1 * margin.left + (total_width - chartHeadrer_wd) / 2)
+          .attr("y", -1 * margin.top + 45)
+          .style("font-size", "14px")
+          .style("stroke", "#69b3a2")
+          .style("stroke-width", "0.5");
+        
+        chartStats.transition().duration(1500).style("opacity", 1);
+
+
+
+          var dataNest_mod = d3.group(filtered, (d) => d.country_name);
           console.log("Filtered dataNest.size", dataNest_mod.size);
 
           x.domain(
             d3.extent(filtered, function (d) {
-              return d.date;
+              return d.property_year;
             })
           );
           y.domain([
             0,
             d3.max(filtered, function (d) {
-              return d.new_cases;
+              return d.property_value;
             }),
           ]);
 
+          
+
           dataNest_mod.forEach(function (d, i) {
+
             counter += 1;
             console.log("DATANEST record:", d);
             svg
               .append("path")
               .attr("class", "line")
+              .datum(d)
+              .style("stroke", function () {
+                return (d.color = color(d))
+              })
+              .attr("d", 
+              d3
+              .line()
+              .x((d) => x(d.property_year))
+              .y(height)
+              ).transition()
+              .duration(1000)
+              .attr("d", 
+              d3
+              .line()
+              .x((d) => x(d.property_year))
+              .y((d) => y(d.property_value))
+              )
+
+              
+        // Add the circle
+        //svg
+        //  .selectAll("myCircles")
+        //  .data(d)
+        //  .join("circle")
+        //  .attr("class", "myCircles")
+        //  .attr("fill", "#3C6A5F")
+        //  .attr("stroke", "black")
+        //  .attr("opacity", "0.5")
+        //  .attr("cx", (d) => x(d.property_year))
+        //  .attr("cy", (d) => y(d.property_value))
+        //  .attr("r", 0)
+        //  .transition()
+        //  .delay(1500)
+        //  .duration(1500)
+        //  .attr("r", 5.5)
+        //  .transition()
+        //  .duration(1000)
+        //  .attr("r", 3);
+
+              filtered = d.filter(function (d) {
+                var yr = +d.property_year.getUTCFullYear()
+                console.log('year',yr)
+                return  yr === 2012;
+                });
+
+              console.log('filtered',filtered)
+            
+            svg.append("text")
+		          .attr("class", "multiLineLabels")
+		          .attr("dy", ".35em")
+		          .attr("text-anchor", "start")
+		          .style("fill", "#69b3a2")
+		          .text(filtered[0].country_name)
+		          .attr("transform", "translate(" + (width+3) + ","+ height+" )")
               .transition()
               .duration(1000)
-              .style("stroke", function () {
-                // Add the colours dynamically
-                //return "red";
-                return (d.color = color(d));
-              })
-              .attr("d", priceline(d));
+		          .attr("transform", "translate(" + (width+3) + "," + y(filtered[0].property_value) + ")")
+            
+
+
+
           });
 
           xAxis
-            .call(d3.axisBottom(x))
+          .transition()
+          .duration(1000)
+            .call(d3.axisBottom(x).ticks(30))
             .selectAll("text")
             .style("text-anchor", "end")
             .style("color", "black")
             .attr("dx", "-.8em")
             .attr("dy", ".15em")
             .attr("transform", "rotate(-65)");
-          yAxis.transition().duration(1000).call(d3.axisLeft(y));
+          yAxis.transition().duration(1000).call(d3.axisLeft(y).tickSizeInner(-width))
+          .call((g) =>
+            g
+              .selectAll(".tick line")
+              .attr("class", "axis_bar")
+              .attr("stroke", "black")
+              .attr("opacity", "0.3")
+
+              
+
+          );
         });
       }
 
@@ -206,15 +316,70 @@
         });
 
         console.log(options);
-        update_1(csv_loc, options);
+        update_1( options);
       });
 
       // Initialize the plot with the first dataset
-      country_list = ["Congo", "United States"];
-      update_1(csv_loc, country_list);
+      country_list = ["United Arab Emirates", "Afghanistan"];
+      update_1(country_list);
+
+    }
+    
+        
+  property = "population";
+  span_id = "graph1_text";
+  menu_span_id = 'menu';
+  location_x = "0";
+  location_y = "0";
+  width_part = "1200";
+  height_part = "400";
+
+  var margin = { top: 100, right: 100, bottom: 70, left: 80 },
+        width = width_part - margin.left - margin.right,
+        height = height_part - margin.top - margin.bottom;
 
 
+  // Parse the date / time
+  const parseTime = d3.timeParse("%Y");
+  // Adds the svg canvas
+  var svg = d3
+    .select("body")
+    .select("#" + span_id)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("position", "relative")
+    .style("top", location_y)
+    .style("left", location_x)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  var xAxis = svg
+    .append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+  var yAxis = svg.append("g").attr("class", "y axis");
+  var chartHeader = svg.append("g").attr("class", "chartHeader");
 
+      
+  var chartStats = svg.append("g").attr("class", "chartStats");
+
+      createMultiLineChart (
+    property,
+    span_id,
+    location_x,
+    location_y,
+    svg,
+    width,
+    height,
+    margin,
+    xAxis,
+    yAxis,
+    chartHeader,
+    chartStats,
+    menu_span_id)
+
+
+    
 
     </script>
     <!--BODY_CHECKPOINT-->

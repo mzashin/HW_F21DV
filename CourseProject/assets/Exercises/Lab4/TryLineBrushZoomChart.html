@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v7.js"></script>
+<script src="./dataFunctions_lab4.js"></script>
+
+<!-- Create a div where the graph will take place -->
+
+<div>
+  <span id="line_chart_1"></span>
+</div>
+<button
+  onclick="createLineChart(property_type,span_id,color_name,chartHeader,'AFG',x_axis_1,x_axis_2,y_axis_1,y_axis_2,width,height1,height2,xaxis1_height_offset)"
+>
+AFG Stats
+</button>
+  <script>
+    function createLineChart(
+      property_type,
+      span_id,
+      color_name,
+      chartHeader,
+      country_code,
+      x_axis_1,
+      x_axis_2,
+      y_axis_1,
+      y_axis_2,
+      width,
+      height1,
+      height2,
+      xaxis1_height_offset
+    ) {
+      //color_name = "lightblue";
+
+      chartHeader
+        .append("rect")
+        .attr("width", width)
+        .attr("height", 20)
+        .attr("x", -10)
+        .attr("y", -25)
+        .attr("fill", "#69b3a2");
+
+      chartHeader
+        .append("text")
+        .attr("class", "linechart_title")
+        .attr("x", width / 2 - 100)
+        .attr("y", -10)
+        .style("fill", "white")
+        .text(country_code + " : " + property_type + " per year");
+
+      chartHeader
+        .append("rect")
+        .attr("width", 400)
+        .attr("height", 20)
+        .attr("x", width / 2 - 140 - 50)
+        .attr("y", height1 + 150 - 60)
+        .attr("fill", "green");
+
+      chartHeader
+        .append("text")
+        .attr("class", "brush_to_zoom")
+        .attr("x", width / 2 - 130)
+        .attr("y", height1 + 165 - 60)
+        .style("fill", "white")
+        .text("Brush Above To View Zoom In Range Below");
+
+      var format = d3.timeFormat("%Y-%m-%d");
+
+      const parseTime = d3.timeParse("%Y");
+
+      propertyStatsPerCountry(property_type, country_code).then(function (
+        data
+      ) {
+          
+        svg.selectAll('path').remove()
+
+        // Add X axis --> it is a date format
+        data.forEach(function (d) {
+          d.property_year = parseTime(d.property_year);
+        });
+
+        svg
+          .select(".linechart_title")
+          .text(country_code + " : " + property_type + " per year");
+
+        console.log(data);
+
+        var x1 = d3.scaleTime().range([0, width]);
+        var y1 = d3.scaleLinear().range([height1, 0]);
+        var x2 = d3.scaleTime().range([0, width]);
+        var y2 = d3.scaleLinear().range([height2, 0]);
+
+        x1.domain(
+          d3.extent(data, function (d) {
+            return d.property_year;
+          })
+        );
+        y1.domain([
+        d3.min(data, function (d) {
+            return d.property_value;
+          }),
+          d3.max(data, function (d) {
+            return d.property_value;
+          }),
+        ]);
+
+        x2.domain(
+          d3.extent(data, function (d) {
+            return d.property_year;
+          })
+        );
+        y2.domain([
+          
+        d3.min(data, function (d) {
+            return d.property_value;
+          }),
+          d3.max(data, function (d) {
+            return d.property_value;
+          }),
+        ]);
+        x_axis_1.transition().duration(1000)
+          .call(d3.axisBottom(x1).ticks(10).tickFormat(d3.timeFormat("%Y")))
+          .selectAll("text")
+          .style("text-anchor", "end")
+          .style("color", "black")
+          .attr("dx", "1em")
+          .attr("dy", ".80em");
+        //.attr("transform", "rotate(-65)");
+        y_axis_1.transition().duration(1000).call(d3.axisLeft(y1).ticks(5).tickSizeInner(-width))
+          .call((g) =>
+            g
+              .selectAll(".tick line")
+              .attr("class", "axis_bar")
+              .attr("stroke", "black")
+              .attr("opacity", "0.1")
+          );
+
+        x_axis_2.transition().duration(1000)
+          .call(d3.axisBottom(x2).ticks(10).tickFormat(d3.timeFormat("%Y")))
+          .selectAll("text")
+          .style("text-anchor", "end")
+          .style("color", "black")
+          .attr("dx", "1em")
+          .attr("dy", ".80em");
+        // .attr("transform", "rotate(-65)");
+        y_axis_2.transition().duration(1000).call(d3.axisLeft(y2).ticks(5).tickSizeInner(-width))
+          .call((g) =>
+            g
+              .selectAll(".tick line")
+              .attr("class", "axis_bar")
+              .attr("stroke", "black")
+              .attr("opacity", "0.1")
+          );
+
+        // Add a clipPath: everything out of this area won't be drawn.
+        const clip = svg
+          .append("defs")
+          .append("svg:clipPath")
+          .attr("id", "clip")
+          .append("svg:rect")
+          .attr("width", width)
+          .attr("height", height1)
+          .attr("x", 0)
+          .attr("y", xaxis1_height_offset);
+
+        const clip2 = svg
+          .append("defs")
+          .append("svg:clipPath")
+          .attr("id", "clip2")
+          .append("svg:rect")
+          .attr("width", width)
+          .attr("height", height2)
+          .attr("x", 0)
+          .attr("y", height2);
+
+        // Add brushing
+        const brush = d3
+          .brushX() // Add the brush feature using the d3.brush function
+          .extent([
+            [0, xaxis1_height_offset],
+            [width, height1 + xaxis1_height_offset],
+          ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+          .on("end", updateChart); // Each time the brush selection changes, trigger the 'updateChart' function
+
+        // Create the line variable: where both the line and the brush take place
+        const line_1 = svg.append("g").attr("clip-path", "url(#clip)");
+        
+        // Add the line
+        line_1
+          .append("path")
+          .datum(data)
+          .attr("class", "line_1") // I add the class line to be able to modify this line later on.
+          .attr("fill", "none")
+          .attr("stroke", color_name)
+          .attr("stroke-width", 1.5)
+          .attr(
+            "d",
+            d3
+              .line()
+              .x(function (d) {
+                return x1(d.property_year);
+              })
+              .y(height1 * 2)
+          ).transition()
+          .duration(1000)
+          .attr(
+            "d",
+            d3
+              .line()
+              .x(function (d) {
+                return x1(d.property_year);
+              })
+              .y(function (d) {
+                return y1(d.property_value) + xaxis1_height_offset;
+              })
+          )
+
+
+        // Add the brushing
+        line_1.append("g").attr("class", "brush").call(brush);
+
+        //const line_2 = svg.append("g").attr("clip-path", "url(#clip)");
+
+        const line_2 = svg.append("g").attr("clip-path", "url(#clip2)");
+
+        // Add the line
+        line_2
+          .append("path")
+          .datum(data)
+          .attr("class", "line_2") // I add the class line to be able to modify this line later on.
+          .attr("fill", "none")
+          .attr("stroke", "lightblue")
+          .attr("stroke-width", 1.5)
+          .attr(
+            "d",
+            d3
+              .line()
+              .x(function (d) {
+                return x2(d.property_year);
+              })
+              .y(+height2 *2)
+          ).transition()
+          .duration(1000)
+          .attr(
+            "d",
+            d3
+              .line()
+              .x(function (d) {
+                return x2(d.property_year);
+              })
+              .y(function (d) {
+                return y2(d.property_value) + height2;
+              })
+          )
+
+        // Add the brushing
+        //line_2.append("g").attr("class", "brush").call(brush);
+
+        // A function that set idleTimeOut to null
+        let idleTimeout;
+        function idled() {
+          idleTimeout = null;
+        }
+
+        function updateChart(event, d) {
+          // What are the selected boundaries?
+          extent = event.selection;
+
+          // If no selection, back to initial coordinate. Otherwise, update X axis domain
+          if (!extent) {
+            if (!idleTimeout) return (idleTimeout = setTimeout(idled, 350)); // This allows to wait a little bit
+            x.domain([4, 8]);
+          } else {
+            console.log("d", d);
+            console.log("extent", extent);
+            console.log("x2.invert(extent[0])", x2.invert(extent[0]));
+            console.log("x2.invert(extent[1])", x2.invert(extent[1]));
+            console.log("x2.invert(0)", x2.invert(0));
+            console.log("x2.invert(width)", x2.invert(width));
+
+            x2.domain(
+              d3.extent(data, function (d) {
+                return d.property_year;
+              })
+            );
+            //x.domain([x.invert(0), x.invert(width)]);
+            x2.domain([x2.invert(extent[0]), x2.invert(extent[1])]);
+            line_1.select(".brush").call(brush.move, null); // This remove the grey brush area as soon as the selection has been done
+          }
+
+          // Update axis and line position
+          x_axis_2.transition().duration(1000).call(d3.axisBottom(x2));
+          line_2
+            .select(".line_2")
+            .transition()
+            .duration(1000)
+            .attr(
+              "d",
+              d3
+                .line()
+                .x(function (d) {
+                  return x2(d.property_year);
+                })
+                .y(function (d) {
+                  return y2(d.property_value) + height2;
+                })
+            );
+        }
+      });
+    }
+
+    span_id = "#line_chart_1";
+    color_name = "lightblue";
+    location_x = "0";
+    location_y = "0";
+    const margin = { top: 30, right: 30, bottom: 70, left: 60 };
+    const width = 600 - margin.left - margin.right;
+    const height1 = 200 - margin.top - margin.bottom;
+    const height2 = 400 - margin.top - margin.bottom - 60;
+    var xaxis1_height_offset = 50;
+    var xaxis1_height = height1 + xaxis1_height_offset;
+
+    property_type = "fertility_rate";
+    country_code = "IND";
+
+    // append the svg object to the body of the page
+    var svg = d3
+      .select(span_id)
+      .append("div")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height2 * 2 + margin.top * 2 + margin.bottom * 2)
+      .style("position", "relative")
+      .style("top", location_y)
+      .style("left", location_x)
+      .append("g")
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var chartHeader = svg.append("g").attr("class", "chartHeader");
+
+    // X axis & Y axis
+    var x_axis_1 = svg
+      .append("g")
+      .attr("transform", "translate(0," + +xaxis1_height + ")");
+    var y_axis_1 = svg
+      .append("g")
+      .attr("class", "myYaxis")
+      .attr("transform", "translate(0," + +xaxis1_height_offset + ")");
+
+    var x_axis_2 = svg
+      .append("g")
+      .attr("transform", "translate(0," + height2 * 2 + ")");
+    var y_axis_2 = svg
+      .append("g")
+      .attr("class", "myYaxis")
+      .attr("transform", "translate(0," + height2 + ")");
+
+    // A function that create / update the plot for a given variable:
+    //function update(data, color_name) {
+
+    createLineChart(
+      property_type,
+      span_id,
+      color_name,
+      chartHeader,
+      country_code,
+      x_axis_1,
+      x_axis_2,
+      y_axis_1,
+      y_axis_2,
+      width,
+      height1,
+      height2,
+      xaxis1_height_offset
+    );
+  </script>
+</button>

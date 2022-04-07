@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v6.js"></script>
+<script src="./dataFunctions_lab4.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+<script>
+  // set the dimensions and margins of the graph
+  const margin = { top: 10, right: 30, bottom: 30, left: 80 },
+    width = 500 - margin.left - margin.right,
+    height = 200 - margin.top - margin.bottom;
+
+  // append the svg object to the body of the page
+  const svg = d3
+    .select("#my_dataviz")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("position", "absolute")
+    .style("top", "0")
+    .style("left", "0");
+
+  const Tooltip = d3
+    .select("#my_dataviz")
+    .append("span")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
+    .style("position", "absolute");
+
+  //Read the data
+  country_code = "AFG";
+  property = "population";
+  const parseTime = d3.timeParse("%Y");
+  combinedPropertyStatsPerCountry(country_code).then(
+    // Now I can use this dataset:
+    function (data) {
+      // Keep only the 90 first rows
+      //data = data.filter((d, i) => i < 90);
+
+      // Add X axis --> it is a date format
+      data.forEach(function (d) {
+        d.property_year = parseTime(d.property_year);
+      });
+      const x = d3
+        .scaleTime()
+        .domain(d3.extent(data, (d) => d.property_year))
+        .range([0, width]);
+      svg
+        .append("g")
+        .attr("transform", `translate(0,  ${height + 5})`)
+        .call(d3.axisBottom(x).ticks(5).tickSizeOuter(0));
+
+      // Add Y axis
+      const y = d3
+        .scaleLinear()
+        .domain(d3.extent(data, (d) => +d[property]))
+        .range([height, 0]);
+      svg
+        .append("g")
+        .attr("transform", "translate(-5,0)")
+        .call(d3.axisLeft(y).tickSizeOuter(0));
+
+      // Add the area
+      svg
+        .append("path")
+        .datum(data)
+        .attr("fill", "#69b3a2")
+        .attr("fill-opacity", 0.3)
+        .attr("stroke", "none")
+        .attr(
+          "d",
+          d3
+            .area()
+            .x((d) => x(d.property_year))
+            .y0(height)
+            .y1((d) => y(d[property]))
+        );
+
+      // Add the line
+      svg
+        .append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "#69b3a2")
+        .attr("stroke-width", 4)
+        .attr(
+          "d",
+          d3
+            .line()
+            .x((d) => x(d.property_year))
+            .y((d) => y(d[property]))
+        );
+
+      const mouseover = function (event, d) {
+        d3.selectAll("circle")
+          .transition()
+          .duration(200)
+          .style("opacity", 0.5)
+          .style("stroke", "transparent");
+
+        Tooltip.style("opacity", 1);
+
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .style("opacity", 1)
+          .style("stroke", "black");
+      };
+      const mousemove = function (event, d) {
+        Tooltip.html(
+          "<u>" +
+            d.country_name +
+            " (" +
+            property +
+            ")" +
+            "</u> : <u>" +
+            parseFloat(d[property].toFixed(2)) +
+            "</u>"
+        )
+          .style("left", event.pageX + 10 + "px")
+          //.style("left", 0 + "px")
+          .style("top", event.pageY + 10 + "px");
+      };
+      var mouseleave = function (event, d) {
+        d3.selectAll("circle")
+          .transition()
+          .duration(200)
+          .style("opacity", 0.8)
+          .style("stroke", "black");
+        d3.select(this).transition().duration(200);
+
+        Tooltip.style("opacity", 0);
+      };
+      var clickfunction = function (event, d) {
+        console.log("Clicked Circle", d);
+        //d3.select(span_id).selectAll(".line_1").remove();
+        //d3.select(span_id).selectAll(".line_2").remove();
+        //createLineChart(csv_loc, d.key, d.property, span_id, color_name);
+      };
+
+      // Add the circle
+      svg
+        .selectAll("myCircles")
+        .data(data)
+        .join("circle")
+        .attr("fill", "red")
+        .attr("stroke", "none")
+        .attr("cx", (d) => x(d.property_year))
+        .attr("cy", (d) => y(d[property]))
+        .attr("r", 3)
+        .attr("stroke", "black")
+        .on("mouseover", mouseover) // What to do when hovered
+        .on("mousemove", mousemove)
+        .on("mouseleave", mouseleave)
+        .on("click", clickfunction);
+    }
+  );
+
+  const svg2 = d3
+    .select("#my_dataviz")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", (height + margin.top + margin.bottom) * 2)
+    .style("position", "absolute")
+    .style("top", "300")
+    .style("left", "0");
+
+  const Tooltip2 = d3
+    .select("#my_dataviz")
+    .append("span")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
+    .style("position", "absolute");
+
+  //Read the data
+  country_code = "AFG";
+  property = "population";
+  combinedPropertyStatsPerCountry(country_code).then(
+    // Now I can use this dataset:
+    function (data) {
+      // Keep only the 90 first rows
+      //data = data.filter((d, i) => i < 90);
+
+      // Add X axis --> it is a date format
+      data.forEach(function (d) {
+        d.property_year = parseTime(d.property_year);
+      });
+      const x = d3
+        .scaleTime()
+        .domain(d3.extent(data, (d) => d.property_year))
+        .range([0, width]);
+      svg2
+        .append("g")
+        .attr("transform", `translate(0,  ${height + 5})`)
+        .call(d3.axisBottom(x).ticks(5).tickSizeOuter(0));
+
+      // Add Y axis
+      const y = d3
+        .scaleLinear()
+        .domain(d3.extent(data, (d) => +d[property]))
+        .range([height, 0]);
+      svg2
+        .append("g")
+        .attr("transform", "translate(-5,0)")
+        .call(d3.axisLeft(y).tickSizeOuter(0));
+
+      // Add the area
+      svg2
+        .append("path")
+        .datum(data)
+        .attr("fill", "#69b3a2")
+        .attr("fill-opacity", 0.3)
+        .attr("stroke", "none")
+        .attr(
+          "d",
+          d3
+            .area()
+            .x((d) => x(d.property_year))
+            .y0(height)
+            .y1((d) => y(d[property]))
+        );
+
+      // Add the line
+      svg2
+        .append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "#69b3a2")
+        .attr("stroke-width", 4)
+        .attr(
+          "d",
+          d3
+            .line()
+            .x((d) => x(d.property_year))
+            .y((d) => y(d[property]))
+        );
+
+      const mouseover = function (event, d) {
+        d3.selectAll("circle")
+          .transition()
+          .duration(200)
+          .style("opacity", 0.5)
+          .style("stroke", "transparent");
+
+        Tooltip2.style("opacity", 1);
+
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .style("opacity", 1)
+          .style("stroke", "black");
+      };
+      const mousemove = function (event, d) {
+        Tooltip2.html(
+          "<u>" +
+            d.country_name +
+            " (" +
+            property +
+            ")" +
+            "</u> : <u>" +
+            parseFloat(d[property].toFixed(2)) +
+            "</u>"
+        )
+          .style("left", event.pageX + 10 + "px")
+          //.style("left", 0 + "px")
+          .style("top", event.pageY + 10 + "px");
+      };
+      var mouseleave = function (event, d) {
+        d3.selectAll("circle")
+          .transition()
+          .duration(200)
+          .style("opacity", 0.8)
+          .style("stroke", "black");
+        d3.select(this).transition().duration(200);
+
+        Tooltip2.style("opacity", 0);
+      };
+      var clickfunction = function (event, d) {
+        console.log("Clicked Circle", d);
+        //d3.select(span_id).selectAll(".line_1").remove();
+        //d3.select(span_id).selectAll(".line_2").remove();
+        //createLineChart(csv_loc, d.key, d.property, span_id, color_name);
+      };
+
+      // Add the circle
+      svg2
+        .selectAll("myCircles")
+        .data(data)
+        .join("circle")
+        .attr("fill", "red")
+        .attr("stroke", "none")
+        .attr("cx", (d) => x(d.property_year))
+        .attr("cy", (d) => y(d[property]))
+        .attr("r", 3)
+        .attr("stroke", "black")
+        .on("mouseover", mouseover) // What to do when hovered
+        .on("mousemove", mousemove)
+        .on("mouseleave", mouseleave)
+        .on("click", clickfunction);
+    }
+  );
+
+  const svg3 = d3
+    .select("#my_dataviz")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", (height + margin.top + margin.bottom) * 2)
+    .style("position", "absolute")
+    .style("top", "150")
+    .style("left", "400");
+
+  const Tooltip3 = d3
+    .select("#my_dataviz")
+    .append("span")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
+    .style("position", "absolute");
+
+  //Read the data
+  country_code = "AFG";
+  property = "population";
+  combinedPropertyStatsPerCountry(country_code).then(
+    // Now I can use this dataset:
+    function (data) {
+      // Keep only the 90 first rows
+      //data = data.filter((d, i) => i < 90);
+
+      // Add X axis --> it is a date format
+      data.forEach(function (d) {
+        d.property_year = parseTime(d.property_year);
+      });
+      const x = d3
+        .scaleTime()
+        .domain(d3.extent(data, (d) => d.property_year))
+        .range([0, width]);
+      svg3
+        .append("g")
+        .attr("transform", `translate(0,  ${height + 5})`)
+        .call(d3.axisBottom(x).ticks(5).tickSizeOuter(0));
+
+      // Add Y axis
+      const y = d3
+        .scaleLinear()
+        .domain(d3.extent(data, (d) => +d[property]))
+        .range([height, 0]);
+      svg3
+        .append("g")
+        .attr("transform", "translate(-5,0)")
+        .call(d3.axisLeft(y).tickSizeOuter(0));
+
+      // Add the area
+      svg3
+        .append("path")
+        .datum(data)
+        .attr("fill", "#69b3a2")
+        .attr("fill-opacity", 0.3)
+        .attr("stroke", "none")
+        .attr(
+          "d",
+          d3
+            .area()
+            .x((d) => x(d.property_year))
+            .y0(height)
+            .y1((d) => y(d[property]))
+        );
+
+      // Add the line
+      svg3
+        .append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "#69b3a2")
+        .attr("stroke-width", 4)
+        .attr(
+          "d",
+          d3
+            .line()
+            .x((d) => x(d.property_year))
+            .y((d) => y(d[property]))
+        );
+
+      const mouseover = function (event, d) {
+        d3.selectAll("circle")
+          .transition()
+          .duration(200)
+          .style("opacity", 0.5)
+          .style("stroke", "transparent");
+
+        Tooltip3.style("opacity", 1);
+
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .style("opacity", 1)
+          .style("stroke", "black");
+      };
+      const mousemove = function (event, d) {
+        Tooltip3.html(
+          "<u>" +
+            d.country_name +
+            " (" +
+            property +
+            ")" +
+            "</u> : <u>" +
+            parseFloat(d[property].toFixed(2)) +
+            "</u>"
+        )
+          .style("left", event.pageX + 10 + "px")
+          //.style("left", 0 + "px")
+          .style("top", event.pageY + 10 + "px");
+      };
+      var mouseleave = function (event, d) {
+        d3.selectAll("circle")
+          .transition()
+          .duration(200)
+          .style("opacity", 0.8)
+          .style("stroke", "black");
+        d3.select(this).transition().duration(200);
+
+        Tooltip3.style("opacity", 0);
+      };
+      var clickfunction = function (event, d) {
+        console.log("Clicked Circle", d);
+        //d3.select(span_id).selectAll(".line_1").remove();
+        //d3.select(span_id).selectAll(".line_2").remove();
+        //createLineChart(csv_loc, d.key, d.property, span_id, color_name);
+      };
+
+      // Add the circle
+      svg3
+        .selectAll("myCircles")
+        .data(data)
+        .join("circle")
+        .attr("fill", "red")
+        .attr("stroke", "none")
+        .attr("cx", (d) => x(d.property_year))
+        .attr("cy", (d) => y(d[property]))
+        .attr("r", 3)
+        .attr("stroke", "black")
+        .on("mouseover", mouseover) // What to do when hovered
+        .on("mousemove", mousemove)
+        .on("mouseleave", mouseleave)
+        .on("click", clickfunction);
+    }
+  );
+</script>

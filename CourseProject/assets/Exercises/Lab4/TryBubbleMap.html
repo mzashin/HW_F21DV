@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v7.js"></script>
+<script src="./dataGrpingAllCountries.js"></script>
+<script src="./dataFunctions_lab4.js"></script>
+
+<!-- Create an element where the map will take place -->
+<div id="my_dataviz_div"></div>
+<script>
+  // The svg
+  function createMapLayout(
+    property,
+    span_id,
+    year,
+    svg,
+    Tooltip,
+    width,
+    height,
+    chartHeader,
+    controlButtons
+  ) {
+    Tooltip.style("opacity", 0)
+      .attr("class", "tooltip")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("padding", "5px")
+      .style("position", "absolute");
+
+    total_width = width;
+    total_height = height;
+
+    chartHeadrer_wd = total_width;
+    chartHeadrer_ht = 20;
+
+    var headerBox = chartHeader
+      .append("rect")
+      .attr("width", chartHeadrer_wd)
+      .attr("height", chartHeadrer_ht)
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("fill", "#69b3a2");
+
+    var headerText = chartHeader
+      .append("text")
+      .attr("class", "buttons")
+      .attr("text-anchor", "middle")
+      .attr("x", chartHeadrer_wd / 2)
+      .attr("y", 15)
+      .style("fill", "white")
+      .text("Geographical distribution of " + property);
+
+    controlButton_wd = total_width / 4 - 50;
+    controlButton_ht = 20;
+
+    var button_ph_1 = controlButtons
+      .append("rect")
+      .attr("width", controlButton_wd)
+      .attr("height", controlButton_ht)
+      .attr("x", 0)
+      .attr("y", +chartHeadrer_ht + 10)
+      .attr("fill", "#69b3a2");
+
+    var button_text_1 = controlButtons
+      .append("text")
+      .attr("class", "buttons")
+      .attr("text-anchor", "middle")
+      .attr("x", controlButton_wd / 2)
+      .attr("y", +chartHeadrer_ht + 10 + 15)
+      .style("fill", "white")
+      .text("World Stats")
+      .on("click", function (event, d) {
+        console.log("Clicked Circle", d);
+        createMapLayout(
+          property,
+          span_id,
+          year,
+          svg,
+          Tooltip,
+          width,
+          height,
+          chartHeader,
+          controlButtons
+        );
+      });
+
+    // Map and projection
+    const path = d3.geoPath();
+    const projection = d3
+      .geoMercator()
+      .scale(100)
+      .center([0, 60])
+      .translate([width / 2, height / 2]);
+
+    // Data and color scale
+    const data = new Map();
+    //var colorScale = d3.scaleLinear().range(["#20B2AA", "#2E8B57"]);
+    var colorScale = d3.scaleLinear().range(["#81E381", "#1E4038"]);
+
+    combinedPropertyStatsPerYear(year).then(function (d) {
+      var property_data = d.map(function (d) {
+        return d[property];
+      });
+
+      colorScale.domain([0, d3.max(property_data)]);
+      console.log("d", d);
+      d.forEach(function (d) {
+        data.set(d.country_code, d.population);
+      });
+
+      console.log("map", data);
+      // Load external data and boot
+      Promise.all([
+        d3.json(
+          "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"
+        ),
+      ]).then(function (loadData) {
+        let topo = loadData[0];
+        console.log("data", data);
+        let mouseOver = function (d) {
+          d3.selectAll(".Country")
+            .transition()
+            .duration(200)
+            .style("opacity", 0.5)
+            .style("stroke", "transparent");
+
+          Tooltip.style("opacity", 1);
+
+          d3.select(this)
+            .transition()
+            .duration(200)
+            .style("opacity", 1)
+            .style("stroke", "black");
+        };
+
+        const mousemove = function (event, d) {
+          //d.total = data.get(d.id) || 0;
+          Tooltip.html(
+            "<u>" +
+              d.properties.name +
+              " (" +
+              property +
+              ")" +
+              "</u> : <u>" +
+              d.total +
+              "</u>"
+          )
+            .style("left", event.pageX + 10 + "px")
+            //.style("left", 0 + "px")
+            .style("top", event.pageY + 10 + "px");
+        };
+
+        let mouseLeave = function (d) {
+          d3.selectAll(".Country")
+            .transition()
+            .duration(200)
+            .style("opacity", 1)
+            .style("stroke", "#ECECEC");
+          d3.select(this).transition().duration(200).style("stroke", "#ECECEC");
+
+          Tooltip.style("opacity", 0);
+        };
+
+        // Draw the map
+        svg.selectAll("path").remove();
+        var mapSvg = svg
+          .append("g")
+          .selectAll("path")
+          .data(topo.features)
+          .enter()
+          .append("path")
+          // draw each country
+          .attr("d", d3.geoPath().projection(projection))
+          // set the color of each country
+          .attr("fill", "white")
+          .attr("fill-opacity", "0.7")
+          .style("stroke", "transparent")
+          .attr("class", function (d) {
+            return "Country";
+          })
+          .style("opacity", 1);
+
+        mapSvg
+          .transition()
+          .delay((d, i) => i * 10)
+          .duration(1500)
+          .attr("fill", function (d) {
+            d.total = data.get(d.id) || 0;
+            console.log("d.id", d.id, " d.total", d.total);
+            return colorScale(d.total);
+          })
+          .style("stroke", "#ECECEC");
+
+        mapSvg
+          .on("mouseover", mouseOver)
+          .on("mousemove", mousemove)
+          .on("mouseleave", mouseLeave);
+      });
+    });
+  }
+
+  property = "population";
+  span_id = "my_dataviz_div";
+  year = 2013;
+  location_x = "0";
+  location_y = "0";
+
+  const width = 650;
+  const height = 500;
+  const svg = d3
+    .select("#" + span_id)
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .style("position", "relative")
+    .style("top", location_y)
+    .style("left", location_x)
+    .append("g")
+    .attr("transform", `translate(0,0)`);
+
+  const Tooltip = d3.select("#" + span_id).append("span");
+
+  var chartHeader = svg.append("g").attr("class", "chartHeader");
+
+  var controlButtons = svg.append("g").attr("class", "controlButtons");
+
+  createMapLayout(
+    property,
+    span_id,
+    year,
+    svg,
+    Tooltip,
+    width,
+    height,
+    chartHeader,
+    controlButtons
+  );
+</script>

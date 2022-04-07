@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="./dataFunctions_lab4.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+      .header{
+          fill: #30554c;
+          font-size: 20px;
+          font-family: 'Trebuchet MS', sans-serif;
+          font-weight: bold
+      }
+      .header_mini{
+          fill: #30554c;
+          font-size: 12px;
+          font-family: georgia;
+          font-weight: bold
+      }
+
+      
+      .value{
+          fill: #697975;
+          font-size: 25px;
+          font-family: helvetica;
+          font-weight: bold
+      }
+  </style>
+  <body id="svgShowcase">
+    <div> <br></div>
+    <div id = 'graph1'> </div>
+      
+      <button onclick="createHeaderStatsVisualization('IND','2013',qsvg,span_id,width,height)">IND Stats</button>
+    <button onclick="createHeaderStatsVisualization('USA','2013',qsvg,span_id,width,height)">USA Stats</button>
+    <button onclick="createHeaderStatsVisualization('EGY','2013',qsvg,span_id,width,height)">EGY Stats</button>
+
+    </body>
+
+    <script>
+
+      function createHeaderStatsVisualization(country_code,year,svg,span_id,width,height){
+      property_list = ["population", "fertility_rate", "life_expectancy"];
+Promise.all([headerStats(country_code, year)]).then( function (data){
+    svg.selectAll('.value').remove()
+    svg.selectAll('.header_title').remove()
+    g_title = country_code + ' Overall Stats'
+    svg
+      .append("text")
+    .attr("class", "header_title")
+      .attr("x", (width/2) - 70)
+      .attr("y", 15)
+      .style("fill", "white")
+      .text(g_title);
+
+svg.append("text")
+    .text('Current ' + property_list[0])
+    .attr("class", "header")
+    .attr("x", (width/3) - 340)
+    .attr("y", (height/2) - 80 + 25)
+    
+svg.append("text")
+    .text('Current ' + property_list[1] + ' %')
+    .attr("class", "header")
+    .attr("x", ((width/3)*2) - 350)
+    .attr("y", (height/2) - 80+ 25)
+    
+svg.append("text")
+    .text('Current ' + property_list[2]+ ' (years)')
+    .attr("class", "header")
+    .attr("x", ((width/3)*3) - 390)
+    .attr("y", (height/2) - 80+ 25)
+
+    
+svg.append("text")
+    .text('% Change (Last 1 Year)')
+    .attr("class", "header_mini")
+    .attr("x", ((width/3)*1) - 350 - 50)
+    .attr("y", (height/2) + 30 + 25)
+
+    
+svg.append("text")
+    .text('% Change (Last 10 Years)')
+    .attr("class", "header_mini")
+    .attr("x", ((width/3)*1) - 350 + 110)
+    .attr("y", (height/2) + 30 + 25)
+
+
+    
+svg.append("text")
+    .text('% Change (Last 1 Year)')
+    .attr("class", "header_mini")
+    .attr("x", ((width/3)*2) - 350 - 50)
+    .attr("y", (height/2) + 30 + 25)
+
+    
+svg.append("text")
+    .text('% Change (Last 10 Years)')
+    .attr("class", "header_mini")
+    .attr("x", ((width/3)*2) - 350 + 110)
+    .attr("y", (height/2) + 30 + 25)
+
+    
+
+    
+svg.append("text")
+    .text('% Change (Last 1 Year)')
+    .attr("class", "header_mini")
+    .attr("x", ((width/3)*3) - 350 - 50)
+    .attr("y", (height/2) + 30 + 25)
+
+    
+svg.append("text")
+    .text('% Change (Last 10 Years)')
+    .attr("class", "header_mini")
+    .attr("x", ((width/3)*3) - 350 + 110)
+    .attr("y", (height/2) + 30 + 25)
+
+
+svg.append("text")
+    .attr("class", "value")
+    .attr("x", ((width/3)*1) - 310)
+    .attr("y", (height/2) - 20+ 25)
+    .transition()
+    .duration(3000)
+        .tween("value", function(d,i) {
+            d = parseFloat(data[0]['current_' + property_list[0]].toFixed(2))
+            var i = d3.interpolate(this.textContent, d),
+                prec = (d + "").split("."),
+                round = (prec.length > 1) ? Math.pow(10, prec[1].length) : 1;
+
+            return function(t) {
+                this.textContent = Math.round(i(t) * round) / round;
+            };
+        });
+        
+svg.append("text")
+    .attr("class", "value")
+    .attr("x", ((width/3)*2) - 260)
+    .attr("y", (height/2) - 20 + 25)
+    .transition()
+    .duration(3000)
+        .tween("value", function(d,i) {
+            d = parseFloat(data[0]['current_' + property_list[1]].toFixed(2))
+            var i = d3.interpolate(this.textContent, d),
+                prec = (d + "").split("."),
+                round = (prec.length > 1) ? Math.pow(10, prec[1].length) : 1;
+
+            return function(t) {
+                this.textContent = Math.round(i(t) * round) / round;
+            };
+        });
+        
+svg.append("text")
+    .attr("class", "value")
+    .attr("x", ((width/3)*3) - 260)
+    .attr("y", (height/2) - 20 + 25)
+    .transition()
+    .duration(3000)
+        .tween("value", function(d,i) {
+            d = parseFloat(data[0]['current_' + property_list[2]].toFixed(2))
+            var i = d3.interpolate(this.textContent, d),
+                prec = (d + "").split("."),
+                round = (prec.length > 1) ? Math.pow(10, prec[1].length) : 1;
+
+            return function(t) {
+                this.textContent = Math.round(i(t) * round) / round;
+            };
+        });
+
+
+svg.append("text")
+    .attr("class", "value")
+    .style("fill", function (){
+ if (data[0][property_list[0] + '_%_change_in_last_1_year'] > 0){return 'green'}
+ else {return 'red'} })
+    .attr("x", ((width/3)*1) - 350 )
+    .attr("y", (height/2) + 70 + 25)
+    .transition()
+    .duration(3000)
+        .tween("value", function(d,i) {
+            d = parseFloat(data[0][property_list[0] + '_%_change_in_last_1_year'].toFixed(2))
+            var i = d3.interpolate(this.textContent, d),
+                prec = (d + "").split("."),
+                round = (prec.length > 1) ? Math.pow(10, prec[1].length) : 1;
+
+            return function(t) {
+                this.textContent = Math.round(i(t) * round) / round;
+            };
+        });
+
+        
+svg.append("text")
+    .attr("class", "value")
+    .style("fill", function (){
+ if (data[0][property_list[0] + '_%_change_in_last_10_year'] > 0){return 'green'}
+ else {return 'red'} })
+    .attr("x", ((width/3)*1) - 350 + 160)
+    .attr("y", (height/2) + 70+ 25)
+    .transition()
+    .duration(3000)
+        .tween("value", function(d,i) {
+            d = parseFloat(data[0][property_list[0] + '_%_change_in_last_10_year'].toFixed(2))
+            var i = d3.interpolate(this.textContent, d),
+                prec = (d + "").split("."),
+                round = (prec.length > 1) ? Math.pow(10, prec[1].length) : 1;
+
+            return function(t) {
+                this.textContent = Math.round(i(t) * round) / round;
+            };
+        });
+
+        
+svg.append("text")
+    .attr("class", "value")
+    .style("fill", function (){
+ if (data[0][property_list[1] + '_%_change_in_last_1_year'] > 0){return 'green'}
+ else {return 'red'} })
+    .attr("x", ((width/3)*2) - 350 )
+    .attr("y", (height/2) + 70 + 25)
+    .transition()
+    .duration(3000)
+        .tween("value", function(d,i) {
+            d = parseFloat(data[0][property_list[1] + '_%_change_in_last_1_year'].toFixed(2))
+            var i = d3.interpolate(this.textContent, d),
+                prec = (d + "").split("."),
+                round = (prec.length > 1) ? Math.pow(10, prec[1].length) : 1;
+
+            return function(t) {
+                this.textContent = Math.round(i(t) * round) / round;
+            };
+        });
+
+        
+svg.append("text")
+    .attr("class", "value")
+    .style("fill", function (){
+ if (data[0][property_list[1] + '_%_change_in_last_10_year'] > 0){return 'green'}
+ else {return 'red'} })
+    .attr("x", ((width/3)*2) - 350 + 160)
+    .attr("y", (height/2) + 70 + 25)
+    .transition()
+    .duration(3000)
+        .tween("value", function(d,i) {
+            d = parseFloat(data[0][property_list[1] + '_%_change_in_last_10_year'].toFixed(2))
+            var i = d3.interpolate(this.textContent, d),
+                prec = (d + "").split("."),
+                round = (prec.length > 1) ? Math.pow(10, prec[1].length) : 1;
+
+            return function(t) {
+                this.textContent = Math.round(i(t) * round) / round;
+            };
+        });
+        
+svg.append("text")
+    .attr("class", "value")
+    .style("fill", function (){
+ if (data[0][property_list[2] + '_%_change_in_last_1_year'] > 0){return 'green'}
+ else {return 'red'} })
+    .attr("x", ((width/3)*3) - 350 )
+    .attr("y", (height/2) + 70+ 25)
+    .transition()
+    .duration(3000)
+        .tween("value", function(d,i) {
+            d = parseFloat(data[0][property_list[2] + '_%_change_in_last_1_year'].toFixed(2))
+            var i = d3.interpolate(this.textContent, d),
+                prec = (d + "").split("."),
+                round = (prec.length > 1) ? Math.pow(10, prec[1].length) : 1;
+
+            return function(t) {
+                this.textContent = Math.round(i(t) * round) / round;
+            };
+        });
+
+        
+svg.append("text")
+    .attr("class", "value")
+    .style("fill", function (){
+ if (data[0][property_list[2] + '_%_change_in_last_10_year'] > 0){return 'green'}
+ else {return 'red'} })
+    .attr("x", ((width/3)*3) - 350 + 160)
+    .attr("y", (height/2) + 70+ 25)
+    .transition()
+    .duration(3000)
+        .tween("value", function(d,i) {
+            d = parseFloat(data[0][property_list[2] + '_%_change_in_last_10_year'].toFixed(2))
+            var i = d3.interpolate(this.textContent, d),
+                prec = (d + "").split("."),
+                round = (prec.length > 1) ? Math.pow(10, prec[1].length) : 1;
+
+            return function(t) {
+                this.textContent = Math.round(i(t) * round) / round;
+            };
+        });
+    })
+}
+
+width = 1400;
+height = 220;
+location_y = 0;
+location_x = 0;
+country_code = 'AFG'
+year = '2013'
+span_id = 'graph1';
+
+ qsvg = d3
+      .select("#" + span_id)
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      //.style('background-color','#E5F9E5')
+      //.style("border", "solid")
+      //.style("border-width", "5px")
+      //.style("border-radius", "10px")
+      //.style("padding", "5px")
+      //.style("border-color", "brown");
+    .style("position", "relative")
+    .style("top", location_y)
+    .style("left", location_x)
+    .append("g")
+
+
+      qsvg
+      .append("rect")
+      .attr("width", width)
+      .attr("height", 20)
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("fill", "#69b3a2");
+
+
+
+      createHeaderStatsVisualization(country_code,year,qsvg,span_id,width,height)
+
+    </script>
+    <!--BODY_CHECKPOINT-->
+  </body>
+</html>

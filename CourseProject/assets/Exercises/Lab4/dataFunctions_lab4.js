@@ -1,21 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body id="svgShowcase">
-    <div> <br></div>
-    <div id = 'graph1_text'> Data Grping</div>
-    <div id = 'graph1'> </div>
-
-    </body>
-
-    <script>
-      function findCsvLoc(property_type) {
+function findCsvLoc(property_type) {
   if (property_type == "population") {
     csv_loc =
       "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab4/dataset/Country-Population.csv";
@@ -94,6 +77,7 @@ function propertyStatsPerYearPerCountry(property_type, year, country_code) {
 }
 
 function propertyStatsPerCountry(property_type, country_code) {
+  csv_loc = findCsvLoc(property_type);
   final_data = d3.csv(csv_loc).then(function (data) {
     column_list = [
       "1960",
@@ -497,47 +481,3 @@ function headerStats(country_code, year) {
   });
   return final_data;
 }
-
-
-
-
-//property_type = 'population';
-//country_code = 'AFG';
-//year = '2013';
-//
-//propertyStatsPerYearPerCountry(property_type,year,country_code);
-//propertyStatsPerCountry(property_type,country_code);
-//propertyStatsPerYear(property_type,year);
-//
-//
-//property_type = 'population';
-//country_code = 'ALL';
-//year = '2013';
-//
-//propertyStatsPerYearPerCountry(property_type,year,country_code);
-//propertyStatsPerCountry(property_type,country_code);
-//
-//country_code = 'AFG';
-//year = '2013';
-//combinedPropertyStatsPerYearPerCountry(year,country_code)
-//combinedPropertyStatsPerCountry(country_code)
-//combinedPropertyStatsPerYear(year)
-//
-//country_code = 'ALL';
-//year = '2013';
-//
-//combinedPropertyStatsPerYearPerCountry(year,country_code)
-//combinedPropertyStatsPerCountry(country_code)
-
-//country_code = 'AFG';
-//year = '2013';
-
-//headerStats(country_code,year)
-
-property_type = 'population'
-propertyStatsForAllYearsForAllCountries(property_type) 
-
-    </script>
-    <!--BODY_CHECKPOINT-->
-  </body>
-</html>
