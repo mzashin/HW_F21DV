@@ -13,7 +13,55 @@ function findCsvLoc(property_type) {
     csv_loc =
       "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab4/dataset/Life-Expectancy-At-Birth.csv";
   }
+
+  if (property_type == "country_metadata") {
+    csv_loc =
+      "https://raw.githubusercontent.com/mzashin/HW_F21DV/main/CourseProject/assets/Exercises/Lab4/dataset/Country-Metadata.csv";
+  }
+
   return csv_loc;
+}
+
+function lookupCountryMetadata(country_code) {
+  property_type = "country_metadata";
+  csv_loc = findCsvLoc(property_type);
+
+  final_data = d3.csv(csv_loc).then(function (data) {
+    var property_data = data.map(function (d) {
+      if (d["IncomeGroup"] == "Low income") {
+        income_grp_key = "LI";
+      }
+      if (d["IncomeGroup"] == "High income: nonOECD") {
+        income_grp_key = "HI";
+      }
+      if (d["IncomeGroup"] == "Upper middle income") {
+        income_grp_key = "UMI";
+      }
+      if (d["IncomeGroup"] == "Lower middle income") {
+        income_grp_key = "LMI";
+      }
+
+      return {
+        country_code: d["Country Code"],
+        country_name: d["Country Name"],
+        income_grp_key: income_grp_key,
+        income_grp_name: d["IncomeGroup"],
+        region: d["Region"],
+      };
+    });
+
+    if (country_code == "ALL") {
+      return property_data;
+    } else {
+      filtered = property_data.filter(function (d) {
+        return d.country_code == country_code;
+      });
+
+      return filtered;
+    }
+  });
+  console.log("Final data", final_data);
+  return final_data;
 }
 
 function aggPropertyValues(property_type, data) {
@@ -479,5 +527,65 @@ function headerStats(country_code, year) {
     console.log("Final Header stats Data:", jsonDataFinal);
     return jsonDataFinal;
   });
+  return final_data;
+}
+
+function combinedPropertyStatsPerYearWithMetadataLookup(year) {
+  property_list = ["population", "fertility_rate", "life_expectancy"];
+
+  final_data = Promise.all([
+    propertyStatsPerYear(property_list[0], year),
+    propertyStatsPerYear(property_list[1], year),
+    propertyStatsPerYear(property_list[2], year),
+    lookupCountryMetadata("ALL"),
+  ]).then(function (loadData) {
+    property_1_data = loadData[0];
+    property_2_data = loadData[1];
+    property_3_data = loadData[2];
+    property_meta_data = loadData[3];
+
+    console.log("Combine data 1", property_1_data);
+    console.log("Combine data 2", property_2_data);
+    console.log("Combine data 3", property_3_data);
+    console.log("Combine data 4", property_meta_data);
+
+    property_1_data.forEach(function (record_p1) {
+      var result_p2 = property_2_data.filter(function (record_p2) {
+        return record_p1.country_code === record_p2.country_code;
+      });
+
+      var result_p3 = property_3_data.filter(function (record_p3) {
+        return record_p1.country_code === record_p3.country_code;
+      });
+
+      var result_metadata = property_meta_data.filter(function (record_p4) {
+        return record_p1.country_code === record_p4.country_code;
+      });
+
+      delete record_p1.property_type;
+      record_p1[property_list[0]] = record_p1.property_value;
+      delete record_p1.property_value;
+      record_p1[property_list[1]] =
+        result_p2[0] !== undefined ? result_p2[0].property_value : null;
+      record_p1[property_list[2]] =
+        result_p3[0] !== undefined ? result_p3[0].property_value : null;
+
+      //Insert Metadata
+      record_p1["income_grp_key"] =
+        result_metadata[0] !== undefined
+          ? result_metadata[0].income_grp_key
+          : null;
+      record_p1["income_grp_name"] =
+        result_metadata[0] !== undefined
+          ? result_metadata[0].income_grp_name
+          : null;
+      record_p1["region"] =
+        result_metadata[0] !== undefined ? result_metadata[0].region : null;
+    });
+    //console.log('Final Combined Data Per Country:',property_1_data);
+    return property_1_data;
+  });
+
+  console.log("Final Combined Data Per Year", final_data);
   return final_data;
 }

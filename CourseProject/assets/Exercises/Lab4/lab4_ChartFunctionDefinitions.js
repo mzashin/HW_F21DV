@@ -14,7 +14,14 @@ function createHeaderStatsVisualization(
   Promise.all([headerStats(country_code, year)]).then(function (data) {
     svg.selectAll(".value").remove();
     svg.selectAll(".header_title").remove();
-    g_title = country_code + " Overall Stats";
+
+    if (country_code == "ALL") {
+      cntry_key = "World";
+    } else {
+      cntry_key = country_code;
+    }
+
+    g_title = cntry_key + " Overall Stats";
     svg
       .append("text")
       .attr("class", "header_title")
@@ -466,9 +473,9 @@ function createMapLayout(
             d.total +
             "</u>"
         )
-          .style("left", event.pageX + 10 + "px")
+          .style("left", event.pageX - 70 + "px")
           //.style("left", 0 + "px")
-          .style("top", event.pageY + 10 + "px");
+          .style("top", event.pageY - 190 + "px");
       };
 
       let mouseLeave = function (d) {
@@ -810,9 +817,9 @@ function createCircularBarPlot(
           +parseFloat(d[property].toFixed(2)) +
           "</u>"
       )
-        .style("left", event.pageX + 10 + "px")
+        .style("left", event.pageX - 70 + "px")
         //.style("left", 0 + "px")
-        .style("top", event.pageY + 10 + "px");
+        .style("top", event.pageY - 190 + "px");
     };
     var mouseleave = function (event, d) {
       d3.selectAll("path")
@@ -842,6 +849,15 @@ function createCircularBarPlot(
         yAxis_acp,
         chartStats_acp,
         chartHeader_acp
+      );
+
+      createHeaderStatsVisualization(
+        d.country_code,
+        year_hs,
+        svg_hs,
+        span_id_hs,
+        width_hs,
+        height_hs
       );
     };
 
@@ -1150,9 +1166,9 @@ function createAreaPointsChart(
             parseFloat(d[property].toFixed(2)) +
             "</u>"
         )
-          .style("left", event.pageX + 10 + "px")
+          .style("left", event.pageX - 70 + "px")
           //.style("left", 0 + "px")
-          .style("top", event.pageY + 10 + "px");
+          .style("top", event.pageY - 190 + "px");
       };
       var mouseleave = function (event, d) {
         d3.selectAll("circle")
@@ -1748,7 +1764,8 @@ function createLollipopChart_lpl1(
       .attr("stroke", "grey");
 
     const mouseover = function (event, d) {
-      d3.selectAll("circle")
+      svg
+        .selectAll("circle")
         .transition()
         .duration(200)
         .style("opacity", 0.5)
@@ -1773,12 +1790,13 @@ function createLollipopChart_lpl1(
           parseFloat(d[property].toFixed(2)) +
           "</u>"
       )
-        .style("left", event.pageX + 10 + "px")
+        .style("left", event.pageX - 70 + "px")
         //.style("left", 0 + "px")
-        .style("top", event.pageY + 10 + "px");
+        .style("top", event.pageY - 190 + "px");
     };
     var mouseleave = function (event, d) {
-      d3.selectAll("circle")
+      svg
+        .selectAll("circle")
         .transition()
         .duration(200)
         .style("opacity", 0.8)
@@ -2106,9 +2124,9 @@ function createLollipopChart_lpl2(
           parseFloat(d[property].toFixed(2)) +
           "</u>"
       )
-        .style("left", event.pageX + 10 + "px")
+        .style("left", event.pageX - 70 + "px")
         //.style("left", 0 + "px")
-        .style("top", event.pageY + 10 + "px");
+        .style("top", event.pageY - 190 + "px");
     };
     var mouseleave = function (event, d) {
       d3.selectAll("circle")
@@ -2227,7 +2245,7 @@ function createLineChart(
     .attr("width", 400)
     .attr("height", 20)
     .attr("x", width / 2 - 140 - 50)
-    .attr("y", height1 + 150 - 60)
+    .attr("y", height1 + 150 - 30)
     .attr("fill", "green");
 
   chartHeader
@@ -2235,7 +2253,7 @@ function createLineChart(
     .attr("class", "brush_to_zoom")
     .attr("font-size", "14px")
     .attr("x", width / 2 - 130)
-    .attr("y", height1 + 165 - 60)
+    .attr("y", height1 + 165 - 30)
     .style("fill", "white")
     .text("Brush Above To View Zoom In Range Below");
 
@@ -2488,5 +2506,337 @@ function createLineChart(
             })
         );
     }
+  });
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////// Grouped Scatter Plot //////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function createGroupedScatterPlot(
+  year,
+  svg,
+  margin,
+  width,
+  height,
+  xAxis,
+  yAxis,
+  Tooltip,
+  chartHeader,
+  chartLegend
+) {
+  // set the dimensions and margins of the graph
+
+  //Read the data
+  combinedPropertyStatsPerYearWithMetadataLookup(year).then(function (data) {
+    total_width = width + margin.left + margin.right;
+    total_height = height + margin.top + margin.bottom;
+
+    Tooltip.style("opacity", 0)
+      .attr("class", "tooltip")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("padding", "5px")
+      .style("position", "absolute");
+
+    chartHeadrer_wd = total_width - 20;
+    chartHeadrer_ht = "20";
+
+    var headerBox = chartHeader
+      .append("rect")
+      .attr("width", chartHeadrer_wd)
+      .attr("height", chartHeadrer_ht)
+      .attr("x", -1 * margin.left + 10)
+      .attr("y", -1 * margin.top)
+      .attr("fill", "#69b3a2");
+
+    var headerText = chartHeader
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("x", -1 * margin.left + chartHeadrer_wd / 2 + 10)
+      .attr("y", -1 * margin.top + 15)
+      .style("fill", "white")
+      .text(
+        "Correlation Between Fertility Rate - Life Expectancy - Income Group"
+      );
+
+    //Set Legendd
+
+    legend_width = 15;
+    legend_height = 15;
+
+    //.domain(["LI", "LMI", "UMI", "HI"])
+    //  .range(["#c4e1db", "#5cac9a", "#52a290", "#1e3a34"]);
+
+    var xAxisLabel = chartLegend
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("transform", "rotate(270)")
+      .attr("x", -150)
+      .attr("y", 20 + legend_height / 2 - 70)
+      .style("fill", "#1e3a34")
+      .text("Life Expectancy")
+      .style("opacity", "0")
+      .transition()
+      .delay(200 * 1)
+      .duration(1000)
+      .style("opacity", "1");
+
+    var yAxisLabel = chartLegend
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("x", width / 2)
+      .attr("y", height + margin.bottom - 10)
+      .style("fill", "#1e3a34")
+      .text("Fertility Rate")
+      .style("opacity", "0")
+      .transition()
+      .delay(200 * 1)
+      .duration(1000)
+      .style("opacity", "1");
+
+    var legend_ph_1 = chartLegend
+      .append("rect")
+      .attr("width", legend_width)
+      .attr("height", legend_height)
+      .attr("x", width + 30)
+      .attr("y", 20)
+      .attr("fill", "#1e3a34")
+      .style("opacity", "0")
+      .transition()
+      .delay(200 * 1)
+      .duration(1000)
+      .style("opacity", "1");
+
+    var legend_ph_2 = chartLegend
+      .append("rect")
+      .attr("width", legend_width)
+      .attr("height", legend_height)
+      .attr("x", width + 30)
+      .attr("y", 60)
+      .attr("fill", "#52a290")
+      .style("opacity", "0")
+      .transition()
+      .delay(200 * 2)
+      .duration(1000)
+      .style("opacity", "1");
+
+    var legend_ph_3 = chartLegend
+      .append("rect")
+      .attr("width", legend_width)
+      .attr("height", legend_height)
+      .attr("x", width + 30)
+      .attr("y", 100)
+      .attr("fill", "#5cac9a")
+      .style("opacity", "0")
+      .transition()
+      .delay(200 * 3)
+      .duration(1000)
+      .style("opacity", "1");
+
+    var legend_ph_4 = chartLegend
+      .append("rect")
+      .attr("width", legend_width)
+      .attr("height", legend_height)
+      .attr("x", width + 30)
+      .attr("y", 140)
+      .attr("fill", "#c4e1db")
+      .style("opacity", "0")
+      .transition()
+      .delay(200 * 4)
+      .duration(1000)
+      .style("opacity", "1");
+
+    var legend_tx_1 = chartLegend
+      .append("text")
+      .attr("x", width + 30 + legend_width + 10)
+      .attr("y", 20 + legend_height / 2 + 5)
+      .style("fill", "#1e3a34")
+      .text("High Income")
+      .style("opacity", "0")
+      .transition()
+      .delay(200 * 1)
+      .duration(1000)
+      .style("opacity", "1");
+
+    var legend_tx_2 = chartLegend
+      .append("text")
+      .attr("x", width + 30 + legend_width + 10)
+      .attr("y", 20 + legend_height / 2 + 5 + 40)
+      .style("fill", "#52a290")
+      .text("Upper Middle Income")
+      .style("opacity", "0")
+      .transition()
+      .delay(200 * 2)
+      .duration(1000)
+      .style("opacity", "1");
+
+    var legend_tx_3 = chartLegend
+      .append("text")
+      .attr("x", width + 30 + legend_width + 10)
+      .attr("y", 20 + legend_height / 2 + 5 + 80)
+      .style("fill", "#5cac9a")
+      .text("Lower Middle Income")
+      .style("opacity", "0")
+      .transition()
+      .delay(200 * 3)
+      .duration(1000)
+      .style("opacity", "1");
+
+    var legend_tx_4 = chartLegend
+      .append("text")
+      .attr("x", width + 30 + legend_width + 10)
+      .attr("y", 20 + legend_height / 2 + 5 + 120)
+      .style("fill", "#c4e1db")
+      .text("Low Income")
+      .style("opacity", "0")
+      .transition()
+      .delay(200 * 4)
+      .duration(1000)
+      .style("opacity", "1");
+
+    console.log("data inside function call", data);
+
+    data = data.filter(function (d) {
+      return d.fertility_rate != 0 && d.life_expectancy != 0;
+    });
+
+    var fertilty_rate_data = data.map(function (d) {
+      return d.fertility_rate;
+    });
+
+    var life_expectancy_data = data.map(function (d) {
+      return d.life_expectancy;
+    });
+
+    // Add X axis
+    const x = d3
+      .scaleLinear()
+      .domain([d3.min(fertilty_rate_data), d3.max(fertilty_rate_data)])
+      .range([0, width]);
+
+    xAxis
+      .transition()
+      .duration(1000)
+      .call(d3.axisBottom(x).tickSizeInner(-height))
+      .call((g) =>
+        g
+          .selectAll(".tick line")
+          .attr("class", "axis_bar")
+          .attr("stroke", "black")
+          .attr("opacity", "0.1")
+      );
+
+    // Add Y axis
+    const y = d3
+      .scaleLinear()
+      .domain([d3.min(life_expectancy_data), d3.max(life_expectancy_data)])
+      .range([height, 0]);
+    yAxis
+      .transition()
+      .duration(1000)
+      .call(d3.axisLeft(y).tickSizeInner(-width))
+      .call((g) =>
+        g
+          .selectAll(".tick line")
+          .attr("class", "axis_bar")
+          .attr("stroke", "black")
+          .attr("opacity", "0.1")
+      );
+
+    // Color scale: give me a specie name, I return a color
+    const color = d3
+      .scaleOrdinal()
+      .domain(["LI", "LMI", "UMI", "HI"])
+      .range(["#c4e1db", "#5cac9a", "#52a290", "#1e3a34"]);
+
+    // Highlight the specie that is hovered
+    const highlight = function (event, d) {
+      selected_specie = d.income_grp_key;
+
+      d3.selectAll(".dot")
+        .transition()
+        .duration(200)
+        .style("fill", "lightgrey")
+        .attr("r", 3);
+
+      d3.selectAll("." + selected_specie)
+        .transition()
+        .duration(200)
+        .style("fill", color(selected_specie))
+        .attr("r", 7);
+
+      Tooltip.style("opacity", 1);
+    };
+
+    // Highlight the specie that is hovered
+    const doNotHighlight = function (event, d) {
+      d3.selectAll(".dot")
+        .transition()
+        .duration(200)
+        .style("fill", (d) => color(d.income_grp_key))
+        .attr("r", 5);
+      Tooltip.style("opacity", 0);
+    };
+
+    const mousemove = function (event, d) {
+      Tooltip.html(
+        "<u>" +
+          d.country_name +
+          "</br> Population:" +
+          "</u> : <u>" +
+          +parseFloat(d.population.toFixed(2)) +
+          "</u>" +
+          "</br> Fertility Rate:" +
+          "</u> : <u>" +
+          +parseFloat(d.fertility_rate.toFixed(2)) +
+          "</u>" +
+          "</br> Life Expectancy:" +
+          "</u> : <u>" +
+          +parseFloat(d.life_expectancy.toFixed(2)) +
+          "</u>" +
+          "</br> Income Group:" +
+          "</u> : <u>" +
+          d.income_grp_name +
+          "</u>"
+      )
+        .style("left", event.pageX - 70 + "px")
+        //.style("left", 0 + "px")
+        .style("top", event.pageY - 190 + "px");
+    };
+
+    // Add dots
+    dots = svg
+      .append("g")
+      .selectAll("dot")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("class", function (d) {
+        return "dot " + d.income_grp_key;
+      })
+      .attr("cx", function (d) {
+        return x(d.fertility_rate);
+      })
+      .attr("cy", function (d) {
+        return y(d.life_expectancy);
+      })
+      .attr("r", 0)
+      .style("fill", function (d) {
+        return color(d.income_grp_key);
+      });
+
+    dots
+      .transition()
+      .delay((d, i) => i * 10)
+      .duration(500)
+      .attr("r", 5);
+
+    dots
+      .on("mouseover", highlight)
+      .on("mousemove", mousemove)
+      .on("mouseleave", doNotHighlight);
   });
 }

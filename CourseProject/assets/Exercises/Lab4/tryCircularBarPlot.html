@@ -9,7 +9,7 @@
 <div id="my_dataviz"></div>
 
 <script>
-  function createAreaPointsChart(
+  function createCircularBarPlot(
     property,
     year,
     span_id,
@@ -60,7 +60,7 @@
       .text("Highest")
       .on("click", function (event, d) {
         console.log("Clicked Circle", d);
-        createAreaPointsChart(
+        createCircularBarPlot(
           property,
           year,
           span_id,
@@ -98,7 +98,7 @@
       .text("Lowest")
       .on("click", function (event, d) {
         console.log("Clicked Circle", d);
-        createAreaPointsChart(
+        createCircularBarPlot(
           property,
           year,
           span_id,
@@ -181,7 +181,7 @@
       chartStats
         .style("opacity", 0)
         .append("text")
-        .style("fill", "#69b3a2")
+        .style("fill", "  ")
         .text(chartStats_key + " " + property)
         .attr("text-anchor", "middle")
         .attr("x", 0)
@@ -409,7 +409,7 @@
   var chartHeader = svg.append("g").attr("class", "chartHeader");
   var data_order = "ASC";
 
-  createAreaPointsChart(
+  createCircularBarPlot(
     property,
     year,
     span_id,

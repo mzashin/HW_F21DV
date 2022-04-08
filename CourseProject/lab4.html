@@ -48,6 +48,7 @@
             <a href="./lab1.html"><li>Lab 1</li></a>
             <a href="./lab2.html"><li>Lab 2</li></a>
             <a href="./lab3.html"><li>Lab 3</li></a>
+            <a href="./lab4.html"><li>Lab 4</li></a>
           </ul>
         </li>
         <li class="nav__listitem">
@@ -124,6 +125,12 @@
       </div>
       <div>
         <span id="svg_section_fe"></span>
+      </div>
+      <div>
+        <span id="svg_section_s6"></span>
+      </div>
+      <div>
+        <span id="svg_section_corr"></span>
       </div>
     </div>
   </body>
@@ -603,7 +610,7 @@
     span_id_section_fe = "#svg_section_fe";
     height_section_fe = 800;
     width_section_fe = 30;
-    location_y_section_fe = "-4002";
+    location_y_section_fe = "-3990";
     location_x_section_fe = "-695";
 
     var svg_section_fe = d3
@@ -630,5 +637,85 @@
         "transform",
         "translate(20," + (1 * height_section_fe) / 2 + ") rotate(-90)"
       );
+
+    span_id_section_corr = "#svg_section_corr";
+    height_section_corr = 450;
+    width_section_corr = 30;
+    location_y_section_corr = "-4380";
+    location_x_section_corr = "-695";
+
+    var svg_section_corr = d3
+      .select(span_id_section_corr)
+      .append("svg")
+      .attr("width", width_section_corr)
+      .attr("height", height_section_corr)
+      .style("background-color", "#2b544b")
+      .style("border", "solid")
+      .style("border-color", "transparent")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("position", "relative")
+      .style("", "relative")
+      .style("top", location_y_section_corr)
+      .style("left", location_x_section_corr);
+
+    svg_section_corr
+      .append("text")
+      .text("FINDING CORRELATION")
+      .attr("fill", "white")
+      .attr("text-anchor", "middle")
+      .attr(
+        "transform",
+        "translate(20," + (1 * height_section_corr) / 2 + ") rotate(-90)"
+      );
+
+    ///////////////]/////////////]/////////////]/////////////]/////////////]/////////////]/////////////]
+    ///////////////GSP
+
+    const margin_gsp = { top: 50, right: 250, bottom: 50, left: 80 },
+      width_gsp = 1350 - margin_gsp.left - margin_gsp.right,
+      height_gsp = 400 - margin_gsp.top - margin_gsp.bottom;
+
+    year_gsp = 2013;
+    span_id_gsp = "svg_section_s6";
+    location_x_gsp = 10;
+    location_y_gsp = -3950;
+
+    // append the svg object to the body of the page
+    const svg_gsp = d3
+      .select("#" + span_id_gsp)
+      .append("svg")
+      .attr("width", width_gsp + margin_gsp.left + margin_gsp.right)
+      .attr("height", height_gsp + margin_gsp.top + margin_gsp.bottom)
+      .style("position", "relative")
+      .style("top", location_y_gsp)
+      .style("left", location_x_gsp)
+      .append("g")
+      .attr("transform", `translate(${margin_gsp.left}, ${margin_gsp.top})`);
+
+    var xAxis_gsp = svg_gsp
+      .append("g")
+      .attr("transform", `translate(0, ${height_gsp})`);
+
+    var yAxis_gsp = svg_gsp.append("g");
+
+    const Tooltip_gsp = d3.select("#" + span_id_gsp).append("span");
+
+    var chartHeader_gsp = svg_gsp.append("g").attr("class", "chartHeader");
+
+    var chartLegend_gsp = svg_gsp.append("g").attr("class", "chartLegend");
+
+    createGroupedScatterPlot(
+      year_gsp,
+      svg_gsp,
+      margin_gsp,
+      width_gsp,
+      height_gsp,
+      xAxis_gsp,
+      yAxis_gsp,
+      Tooltip_gsp,
+      chartHeader_gsp,
+      chartLegend_gsp
+    );
   </script>
 </html>
